@@ -1,14 +1,14 @@
+export enum StudentStatus {
+  AVAILABLE = 'available',
+  RESERVED = 'reserved',
+  HIRED = 'hired',
+}
+
 export interface Student
   extends StudentRegister,
     Omit<ImportedStudent, 'email'> {
   id: string;
   status: StudentStatus;
-}
-
-export enum StudentStatus {
-  AVAILABLE = 'available',
-  RESERVED = 'reserved',
-  HIRED = 'hired',
 }
 
 export interface ImportedStudent {
@@ -18,6 +18,20 @@ export interface ImportedStudent {
   projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls: number;
+}
+
+export enum ExpectedTypeWork {
+  AT_LOCATION,
+  READY_TO_MOVE,
+  REMOTE,
+  HYBRID,
+  IRRELEVANT,
+}
+
+export enum ExpectedContractType {
+  EMPLOYMENT_CONTRACT,
+  B_TO_B,
+  COMMISSION_CONTRACT_OR_SPECIFIC_TASK_CONTRACT,
 }
 
 export interface StudentRegister {
@@ -38,20 +52,6 @@ export interface StudentRegister {
   education: string;
   workExperience: string;
   courses: string;
-}
-
-export enum ExpectedTypeWork {
-  AT_LOCATION,
-  READY_TO_MOVE,
-  REMOTE,
-  HYBRID,
-  IRRELEVANT,
-}
-
-export enum ExpectedContractType {
-  EMPLOYMENT_CONTRACT,
-  B_TO_B,
-  COMMISSION_CONTRACT_OR_SPECIFIC_TASK_CONTRACT,
 }
 
 export interface StudentRes
