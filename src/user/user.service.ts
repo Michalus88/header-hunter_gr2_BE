@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
-import { MulterDiskUploadedFiles } from 'types/files/files';
+import { MulterDiskUploadedFiles } from 'types';
 import { csvParse } from 'src/utils/csvParse';
 import { storageDir } from 'src/utils/storage';
 
