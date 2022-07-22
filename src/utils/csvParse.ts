@@ -1,6 +1,18 @@
 import * as Papa from 'papaparse';
 import { ObjAfterCSVImport } from 'types';
 
+function validate(arr: ObjAfterCSVImport[]): ObjAfterCSVImport[] {
+  return arr.filter((el) => {
+    return (
+      el.email.includes('@') &&
+      !isNaN(el.courseCompletion) &&
+      !isNaN(el.courseEngagment) &&
+      !isNaN(el.projectDegree) &&
+      el.bonusProjectUrls.includes('https://github.com/')
+    );
+  });
+}
+
 export function papaparseToArrOfObj(csvText: string): ObjAfterCSVImport[] {
   const csvObj = Papa.parse(csvText);
   let csvObjTmp: ObjAfterCSVImport = {
@@ -23,13 +35,13 @@ export function papaparseToArrOfObj(csvText: string): ObjAfterCSVImport[] {
       bonusProjectUrls: '',
     };
     csvObjTmp.email = csvObj.data[i][0];
-    csvObjTmp.courseCompletion = csvObj.data[i][1];
-    csvObjTmp.courseEngagment = csvObj.data[i][2];
-    csvObjTmp.projectDegree = csvObj.data[i][3];
-    csvObjTmp.teamProjectDegree = csvObj.data[i][4];
+    csvObjTmp.courseCompletion = Number(csvObj.data[i][1]);
+    csvObjTmp.courseEngagment = Number(csvObj.data[i][2]);
+    csvObjTmp.projectDegree = Number(csvObj.data[i][3]);
+    csvObjTmp.teamProjectDegree = Number(csvObj.data[i][4]);
     csvObjTmp.bonusProjectUrls = csvObj.data[i][5];
     csvArrObj[i - 1] = csvObjTmp;
   }
 
-  return csvArrObj;
+  return validate(csvArrObj);
 }
