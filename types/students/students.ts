@@ -4,14 +4,7 @@ export enum StudentStatus {
   HIRED = 'hired',
 }
 
-export interface Student
-  extends StudentRegister,
-    Omit<ImportedStudent, 'email'> {
-  id: string;
-  status: StudentStatus;
-}
-
-export interface ImportedStudent {
+export interface ImportedStudentData {
   email: string;
   courseCompletion: number;
   courseEngagement: number;
@@ -34,7 +27,7 @@ export enum ExpectedContractType {
   COMMISSION_CONTRACT_OR_SPECIFIC_TASK_CONTRACT,
 }
 
-export interface StudentRegister {
+export interface StudentProfileRegister {
   email: string;
   tel: string | null;
   firstName: string;
@@ -54,6 +47,11 @@ export interface StudentRegister {
   courses: string;
 }
 
-export interface StudentRes
-  extends ImportedStudent,
-    Omit<StudentRegister, 'email'> {}
+export interface StudentData
+  extends ImportedStudentData,
+    Omit<StudentProfileRegister, 'email'> {
+  id: string;
+  status: StudentStatus;
+}
+
+export type StudentRes = Omit<StudentData, 'password'>;

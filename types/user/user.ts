@@ -4,7 +4,7 @@ export enum Role {
   ADMIN = 3,
 }
 
-export interface User {
+export interface UserData {
   id: string;
   isActive: boolean;
   role: Role;
@@ -12,4 +12,4 @@ export interface User {
   password: string;
 }
 
-export type UserRes = Omit<User, 'password' | 'isActive'>;
+export type UserRes = Omit<UserData, 'password' | 'isActive'>;
