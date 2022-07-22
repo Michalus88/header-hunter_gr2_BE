@@ -8,7 +8,7 @@ export interface HrProfileRegister {
   maxReservedStudents: number;
 }
 
-export interface HrRes extends Omit<HrProfileRegister, 'password'> {
+export interface HrRes extends HrProfileRegister {
   id: string;
   reservedStudents: StudentRes[] | [];
 }

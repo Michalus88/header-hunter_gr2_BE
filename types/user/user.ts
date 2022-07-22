@@ -8,6 +8,8 @@ export interface UserData {
   id: string;
   isActive: boolean;
   role: Role;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }
