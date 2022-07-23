@@ -8,7 +8,8 @@ import { UserService } from './user.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import * as path from 'path';
 import { multerStorage, storageDir } from 'src/utils/storage';
-import { MulterDiskUploadedFiles } from 'types/files/files';
+import { MulterDiskUploadedFiles } from 'src/interfaces';
+import { ImportedStudent } from 'types';
 
 @Controller('user')
 export class UserController {
@@ -26,7 +27,7 @@ export class UserController {
       { storage: multerStorage(path.join(storageDir(), 'students-list')) },
     ),
   )
-  addCSV(@UploadedFiles() files: MulterDiskUploadedFiles): string {
+  addCSV(@UploadedFiles() files: MulterDiskUploadedFiles): ImportedStudent[] {
     return this.userService.addCSV(files);
   }
 }

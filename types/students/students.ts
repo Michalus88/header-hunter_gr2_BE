@@ -14,10 +14,10 @@ export interface Student
 export interface ImportedStudent {
   email: string;
   courseCompletion: number;
-  courseEngagement: number;
+  courseEngagment: number;
   projectDegree: number;
   teamProjectDegree: number;
-  bonusProjectUrls: number;
+  bonusProjectUrls: string[];
 }
 
 export enum ExpectedTypeWork {
