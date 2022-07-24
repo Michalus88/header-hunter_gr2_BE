@@ -17,7 +17,7 @@ export interface ImportedStudent {
   courseEngagment: number;
   projectDegree: number;
   teamProjectDegree: number;
-  bonusProjectUrls: string[];
+  bonusProjectUrls: URL[];
 }
 
 export enum ExpectedTypeWork {
