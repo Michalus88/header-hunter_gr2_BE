@@ -7,9 +7,17 @@ function validate(arr: ImportedStudent[]): ImportedStudent[] {
       el.email.includes('@') &&
       !isNaN(el.courseCompletion) &&
       !isNaN(el.courseEngagment) &&
-      !isNaN(el.projectDegree)
-      //I need to find another solution to validate an array of strings, not a single string
-      // el.bonusProjectUrls.includes('https://github.com/')
+      !isNaN(el.projectDegree) &&
+      !isNaN(el.teamProjectDegree) &&
+      el.courseCompletion >= 0 &&
+      el.courseCompletion <= 5 &&
+      el.courseEngagment >= 0 &&
+      el.courseEngagment <= 5 &&
+      el.projectDegree >= 0 &&
+      el.projectDegree <= 5 &&
+      el.teamProjectDegree >= 0 &&
+      el.teamProjectDegree <= 5 &&
+      el.bonusProjectUrls.every((el2) => String(el2).includes('github.com'))
     );
   });
 }
