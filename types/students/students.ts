@@ -7,10 +7,10 @@ export enum StudentStatus {
 export interface ImportedStudentData {
   email: string;
   courseCompletion: number;
-  courseEngagement: number;
+  courseEngagment: number;
   projectDegree: number;
   teamProjectDegree: number;
-  bonusProjectUrls: number;
+  bonusProjectUrls: URL[];
 }
 
 export enum ExpectedTypeWork {
