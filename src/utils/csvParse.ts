@@ -1,9 +1,9 @@
 import * as Papa from 'papaparse';
-import { ImportedStudent } from 'types';
+import { ImportedStudentData } from 'types';
 
-export function validateImportedStudents(
-  arr: ImportedStudent[],
-): ImportedStudent[] {
+export function validateImportedStudentDatas(
+  arr: ImportedStudentData[],
+): ImportedStudentData[] {
   return arr.filter((el) => {
     return (
       el.email.includes('@') &&
@@ -24,7 +24,7 @@ export function validateImportedStudents(
   });
 }
 
-export function papaparseToArrOfObj(csvText: string): ImportedStudent[] {
+export function papaparseToArrOfObj(csvText: string): ImportedStudentData[] {
   const csvObj = Papa.parse(csvText);
 
   const csvArrObj = [];
