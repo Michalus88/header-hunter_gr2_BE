@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
-import { papaparseToArrOfObj } from 'src/utils/csvParse';
+import {
+  papaparseToArrOfObj,
+  validateImportedStudents,
+} from 'src/utils/csvParse';
 import { storageDir } from 'src/utils/storage';
 import { MulterDiskUploadedFiles } from 'src/interfaces';
 import { ImportedStudent } from 'types';
@@ -23,6 +26,6 @@ export class UserService {
       throw e2;
     }
 
-    return papaparseToArrOfObj(csvText);
+    return validateImportedStudents(papaparseToArrOfObj(csvText));
   }
 }
