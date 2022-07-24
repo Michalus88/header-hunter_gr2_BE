@@ -1,14 +1,14 @@
-import { Student } from '../students';
+import { StudentRes } from '../students';
 
-export interface HrRegister {
+export interface HrProfileRegister {
   email: string;
-  password: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   company: string;
   maxReservedStudents: number;
 }
 
-export interface HrRes extends Omit<HrRegister, 'password'> {
+export interface HrRes extends HrProfileRegister {
   id: string;
-  reservedStudents: Student[] | [];
+  reservedStudents: StudentRes[] | [];
 }
