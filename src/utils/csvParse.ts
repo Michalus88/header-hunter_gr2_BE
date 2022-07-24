@@ -16,24 +16,19 @@ function validate(arr: ImportedStudent[]): ImportedStudent[] {
 
 export function papaparseToArrOfObj(csvText: string): ImportedStudent[] {
   const csvObj = Papa.parse(csvText);
+
   const csvArrObj = [];
 
   for (let i = 1; i < csvObj.data.length - 1; i++) {
     const csvObjTmp = {
-      email: '',
-      courseCompletion: 0,
-      courseEngagment: 0,
-      projectDegree: 0,
-      teamProjectDegree: 0,
-      bonusProjectUrls: [],
+      email: csvObj.data[i][0],
+      courseCompletion: Number(csvObj.data[i][1]),
+      courseEngagment: Number(csvObj.data[i][2]),
+      projectDegree: Number(csvObj.data[i][3]),
+      teamProjectDegree: Number(csvObj.data[i][4]),
+      bonusProjectUrls: csvObj.data[i][5].split(' '),
     };
-    csvObjTmp.email = csvObj.data[i][0];
-    csvObjTmp.courseCompletion = Number(csvObj.data[i][1]);
-    csvObjTmp.courseEngagment = Number(csvObj.data[i][2]);
-    csvObjTmp.projectDegree = Number(csvObj.data[i][3]);
-    csvObjTmp.teamProjectDegree = Number(csvObj.data[i][4]);
-    csvObjTmp.bonusProjectUrls = csvObj.data[i][5].split(' ');
-    csvArrObj[i - 1] = csvObjTmp;
+    csvArrObj.push(csvObjTmp);
   }
 
   return validate(csvArrObj);
