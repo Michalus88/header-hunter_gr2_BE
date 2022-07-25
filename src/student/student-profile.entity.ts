@@ -3,6 +3,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -13,6 +14,7 @@ import { StudentProjectUrl } from './student-project-url.entity';
 import { StudentGrades } from './student-grades.entity';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
+import { HrProfile } from '../hr/hr-profile.entity';
 
 @Entity()
 export class StudentProfile extends BaseEntity {
@@ -86,4 +88,8 @@ export class StudentProfile extends BaseEntity {
 
   @Column({ type: 'multilinestring', nullable: true })
   courses: string;
+
+  @ManyToOne((type) => HrProfile, (entity) => entity.reservedStudents)
+  @JoinColumn()
+  bookingProfileHr: HrProfile;
 }
