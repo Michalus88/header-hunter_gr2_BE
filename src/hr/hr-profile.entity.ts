@@ -15,6 +15,10 @@ export class HrProfile extends BaseEntity implements HrProfileRegister {
   id: string;
 
   @IsNotEmpty()
+  @Column({ length: 36 })
+  userId: string;
+
+  @IsNotEmpty()
   @Column({ length: 255 })
   firstName: string;
 
@@ -40,6 +44,6 @@ export class HrProfile extends BaseEntity implements HrProfileRegister {
   })
   maxReservedStudents: number;
 
-  @OneToMany(() => StudentProfile, (entity) => entity.bookingProfileHr)
+  @OneToMany(() => StudentProfile, (entity) => entity.hrProfile)
   reservedStudents: StudentProfile[];
 }
