@@ -18,19 +18,19 @@ export class StudentGrades
   id: string;
 
   @IsNotEmpty()
-  @Column({ type: 'smallint' })
+  @Column({ type: 'float', precision: 3, scale: 2 })
   courseCompletion: number;
 
   @IsNotEmpty()
-  @Column({ type: 'smallint' })
+  @Column({ type: 'float', precision: 3, scale: 2 })
   courseEngagement: number;
 
   @IsNotEmpty()
-  @Column({ type: 'smallint' })
+  @Column({ type: 'float', precision: 3, scale: 2 })
   projectDegree: number;
 
   @IsNotEmpty()
-  @Column({ type: 'smallint' })
+  @Column({ type: 'float', precision: 3, scale: 2 })
   teamProjectDegree: number;
 
   @OneToOne(() => StudentProfile)
