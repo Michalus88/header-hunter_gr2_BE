@@ -10,7 +10,7 @@ export interface ImportedStudentData {
   courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
-  bonusProjectUrls: number;
+  bonusProjectUrls: URL[];
 }
 
 export enum ExpectedTypeWork {
@@ -28,12 +28,9 @@ export enum ExpectedContractType {
 }
 
 export interface StudentProfileRegister {
-  email: string;
   tel: string | null;
-  firstName: string;
-  lastName: string;
   githubUsername: string;
-  portfolioUrls: URL[] | [];
+  portfolioUrls: URL[] | null;
   projectUrls: URL[];
   bio: string | null;
   expectedTypeWork: ExpectedTypeWork;
@@ -42,15 +39,16 @@ export interface StudentProfileRegister {
   expectedSalary: number | null;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
-  education: string;
-  workExperience: string;
-  courses: string;
+  education: string | null;
+  workExperience: string | null;
+  courses: string | null;
 }
 
 export interface StudentData
   extends ImportedStudentData,
     Omit<StudentProfileRegister, 'email'> {
   id: string;
+  userId: string;
   status: StudentStatus;
 }
 
