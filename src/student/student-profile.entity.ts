@@ -8,7 +8,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ExpectedContractType, ExpectedTypeWork } from 'types';
+import {
+  ExpectedContractType,
+  ExpectedTypeWork,
+  StudentProfileRegister,
+} from 'types';
 import { IsNotEmpty } from 'class-validator';
 import { StudentProjectUrl } from './student-project-url.entity';
 import { StudentGrades } from './student-grades.entity';
@@ -17,9 +21,20 @@ import { StudentPortfolioUrl } from './student-portfolio-url.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 
 @Entity()
-export class StudentProfile extends BaseEntity {
+export class StudentProfile
+  extends BaseEntity
+  implements
+    Omit<
+      StudentProfileRegister,
+      'portfolioUrls' | 'bonusProjectUrls' | 'projectUrls'
+    >
+{
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @IsNotEmpty()
+  @Column({ length: 36 })
+  userId: string;
 
   @Column({ length: 255 })
   firstName: string;
@@ -48,7 +63,7 @@ export class StudentProfile extends BaseEntity {
   portfolioUrls: StudentPortfolioUrl[];
 
   @OneToMany(() => StudentProjectUrl, (entity) => entity.studentProfile)
-  studentProjectUrls: StudentProjectUrl[];
+  projectUrls: StudentProjectUrl[];
 
   @OneToMany(() => BonusProjectUrl, (entity) => entity.studentProfile)
   bonusProjectUrls: BonusProjectUrl[];
@@ -91,5 +106,5 @@ export class StudentProfile extends BaseEntity {
 
   @ManyToOne((type) => HrProfile, (entity) => entity.reservedStudents)
   @JoinColumn()
-  bookingProfileHr: HrProfile;
+  hrProfile: HrProfile;
 }

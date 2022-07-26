@@ -18,7 +18,7 @@ export class StudentProjectUrl extends BaseEntity {
   @Column({ length: 255 })
   url: string;
 
-  @ManyToOne((type) => StudentProfile, (entity) => entity.studentProjectUrls)
+  @ManyToOne((type) => StudentProfile, (entity) => entity.projectUrls)
   @JoinColumn()
   studentProfile: StudentProfile;
 }
