@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import { hashPwd } from '../utils/hash-pwd';
 import { Role, UserRes, ImportedStudentData } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
+import { HrProfile } from '../hr/hr-profile.entity';
 
 import {
   papaparseToArrOfObj,
@@ -32,16 +33,21 @@ export class UserService {
     const user = new User();
     const salt = uuid();
     const password = uuid();
-    const registerToken = uuid();
     user.email = email;
     user.password = user.password = hashPwd(password, salt);
-    user.firstName = firstName;
-    user.lastName = lastName;
     user.role = Role.HR;
     user.salt = salt;
-    user.registerToken = registerToken;
+    user.registerToken = uuid();
+
+    const profile = new HrProfile();
+    profile.firstName = firstName;
+    profile.lastName = lastName;
+    profile.email = email;
+    profile.company = company;
+    profile.maxReservedStudents = maxReservedStudents;
 
     await user.save();
+    await profile.save();
     return { user, password };
     // return sanitizeUser(user);
   }
@@ -68,6 +74,7 @@ export class UserService {
     );
 
     return validateImportedStudentList;
+    
     // async studentRegister(): Promise<UserRes> {
     //   //TUTAJ MUSISZ ZROBIĆ VALIDACJĘ POD KONTEM @ W EMAILU
 

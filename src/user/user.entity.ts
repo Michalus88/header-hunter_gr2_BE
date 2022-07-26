@@ -12,12 +12,6 @@ export class User extends BaseEntity implements UserData {
   })
   isActive: boolean;
 
-  @Column({ nullable: true, length: 255 })
-  firstName: string;
-
-  @Column({ nullable: true, length: 255 })
-  lastName: string;
-
   @Column({
     length: 255,
     unique: true,

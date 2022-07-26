@@ -10,5 +10,5 @@ export interface HrProfileRegister {
 
 export interface HrRes extends HrProfileRegister {
   id: string;
-  reservedStudents: StudentRes[] | [];
+  reservedStudents: StudentRes[] | null;
 }
