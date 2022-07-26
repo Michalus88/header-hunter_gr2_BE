@@ -36,7 +36,7 @@ export interface StudentProfileRegister {
   expectedTypeWork: ExpectedTypeWork;
   targetWorkCity: string | null;
   expectedContractType: ExpectedContractType;
-  expectedSalary: number | null;
+  expectedSalary: string | null;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
   education: string | null;
