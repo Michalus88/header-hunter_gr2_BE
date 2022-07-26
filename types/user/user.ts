@@ -8,10 +8,13 @@ export interface UserData {
   id: string;
   isActive: boolean;
   role: Role;
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
+  salt: string;
+  registerToken: string | null;
 }
 
-export type UserRes = Omit<UserData, 'password' | 'isActive'>;
+export type UserRes = Omit<
+  UserData,
+  'password' | 'isActive' | 'salt' | 'registerToken'
+>;
