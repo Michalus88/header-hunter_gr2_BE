@@ -1,9 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { uuid } from 'uuidv4';
+import * as path from 'path';
+import * as fs from 'fs';
 import { User } from './user.entity';
 import { hashPwd } from '../utils/hash-pwd';
-import { Role, UserRes } from 'types';
+import { Role, UserRes, ImportedStudentData } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
+
+import {
+  papaparseToArrOfObj,
+  validateImportedStudentDatas,
+} from 'src/utils/csvParse';
+import { storageDir } from 'src/utils/storage';
+import { MulterDiskUploadedFiles } from 'src/interfaces';
 
 @Injectable()
 export class UserService {
@@ -37,25 +46,47 @@ export class UserService {
     // return sanitizeUser(user);
   }
 
-  async studentRegister(): Promise<UserRes> {
-    //TUTAJ MUSISZ ZROBIĆ VALIDACJĘ POD KONTEM @ W EMAILU
+  async studentRegister(
+    files: MulterDiskUploadedFiles,
+  ): Promise<ImportedStudentData[]> {
+    const csvFile = files?.studentsList?.[0] ?? null;
+    let csvText = '';
+    try {
+      if (csvFile) {
+        csvText = String(
+          fs.readFileSync(
+            path.join(storageDir(), 'students-list', csvFile.filename),
+          ),
+        );
+      }
+    } catch (e2) {
+      throw e2;
+    }
 
-    // await this.checkingEmailAvailability(email) // walidacja czy już istnieje w bazie
+    const validateImportedStudentList = validateImportedStudentDatas(
+      papaparseToArrOfObj(csvText),
+    );
 
-    const user = new User();
-    const salt = uuid();
-    const password = uuid();
-    const registerToken = uuid();
-    // user.email = email; //dodasz jak wyciągniesz emaila z pliku
-    user.password = user.password = hashPwd(password, salt);
-    //POLE fullName będzie dodane przy aktywacji studenta
-    user.role = Role.STUDENT;
-    user.salt = salt;
-    user.registerToken = registerToken;
+    return validateImportedStudentList;
+    // async studentRegister(): Promise<UserRes> {
+    //   //TUTAJ MUSISZ ZROBIĆ VALIDACJĘ POD KONTEM @ W EMAILU
 
-    await user.save();
-    return user;
-    // return sanitizeUser(user);
+    //   // await this.checkingEmailAvailability(email) // walidacja czy już istnieje w bazie
+
+    //   const user = new User();
+    //   const salt = uuid();
+    //   const password = uuid();
+    //   const registerToken = uuid();
+    //   // user.email = email; //dodasz jak wyciągniesz emaila z pliku
+    //   user.password = user.password = hashPwd(password, salt);
+    //   //POLE fullName będzie dodane przy aktywacji studenta
+    //   user.role = Role.STUDENT;
+    //   user.salt = salt;
+    //   user.registerToken = registerToken;
+
+    //   await user.save();
+    //   return user;
+    //   // return sanitizeUser(user);
   }
 
   async checkingEmailAvailability(email) {
