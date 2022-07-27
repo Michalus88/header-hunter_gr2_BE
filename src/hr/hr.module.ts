@@ -4,6 +4,6 @@ import { HrService } from './hr.service';
 
 @Module({
   controllers: [HrController],
-  providers: [HrService]
+  providers: [HrService],
 })
 export class HrModule {}
