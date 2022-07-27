@@ -14,7 +14,6 @@ export class StudentProjectUrl extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @IsNotEmpty()
   @Column({ length: 255 })
   url: string;
 
