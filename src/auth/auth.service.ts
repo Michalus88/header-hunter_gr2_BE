@@ -4,6 +4,7 @@ import { sign } from 'jsonwebtoken';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { hashPwd } from 'src/utils/hash-pwd';
+import { sanitizeUser } from '../utils/sanitize-user';
 // import { sanitizeUser } from 'src/utils/sanitize-user';
 
 @Injectable()
@@ -30,7 +31,7 @@ export class AuthService {
         httpOnly: true,
         maxAge: oneDay,
       })
-      .json(user);
+      .json(sanitizeUser(user));
   }
 
   logout(res: Response) {
