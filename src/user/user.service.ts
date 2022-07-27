@@ -9,7 +9,7 @@ import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 
 import {
   papaparseToArrOfObj,
-  validateImportedStudentDatas,
+  validateImportedStudentData,
 } from 'src/utils/csvParse';
 import { storageDir } from 'src/utils/storage';
 import { MulterDiskUploadedFiles } from 'src/interfaces';
@@ -76,7 +76,7 @@ export class UserService {
       throw e2;
     }
 
-    const validateImportedStudentList = validateImportedStudentDatas(
+    const validateImportedStudentList = validateImportedStudentData(
       papaparseToArrOfObj(csvText),
     );
 

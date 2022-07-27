@@ -1,20 +1,20 @@
 import * as Papa from 'papaparse';
 import { ImportedStudentData } from 'types';
 
-export function validateImportedStudentDatas(
+export function validateImportedStudentData(
   arr: ImportedStudentData[],
 ): ImportedStudentData[] {
   return arr.filter((el) => {
     return (
       el.email.includes('@') &&
       !isNaN(el.courseCompletion) &&
-      !isNaN(el.courseEngagment) &&
+      !isNaN(el.courseEngagement) &&
       !isNaN(el.projectDegree) &&
       !isNaN(el.teamProjectDegree) &&
       el.courseCompletion >= 0 &&
       el.courseCompletion <= 5 &&
-      el.courseEngagment >= 0 &&
-      el.courseEngagment <= 5 &&
+      el.courseEngagement >= 0 &&
+      el.courseEngagement <= 5 &&
       el.projectDegree >= 0 &&
       el.projectDegree <= 5 &&
       el.teamProjectDegree >= 0 &&
@@ -33,7 +33,7 @@ export function papaparseToArrOfObj(csvText: string): ImportedStudentData[] {
     const csvObjTmp = {
       email: csvObj.data[i][0],
       courseCompletion: Number(csvObj.data[i][1]),
-      courseEngagment: Number(csvObj.data[i][2]),
+      courseEngagement: Number(csvObj.data[i][2]),
       projectDegree: Number(csvObj.data[i][3]),
       teamProjectDegree: Number(csvObj.data[i][4]),
       bonusProjectUrls: csvObj.data[i][5].split(' '),
