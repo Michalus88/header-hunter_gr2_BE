@@ -39,8 +39,6 @@ export class UserService {
     user.id = userId;
     user.email = email;
     user.password = user.password = hashPwd(password, salt);
-    user.firstName = firstName;
-    user.lastName = lastName;
     user.role = Role.HR;
     user.salt = salt;
     user.registerToken = registerToken;
