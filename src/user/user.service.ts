@@ -14,6 +14,7 @@ import {
 import { storageDir } from 'src/utils/storage';
 import { MulterDiskUploadedFiles } from 'src/interfaces';
 import { MailService } from '../mail/mail.service';
+import { sanitizeUser } from '../utils/sanitize-user';
 
 @Injectable()
 export class UserService {
@@ -52,8 +53,7 @@ export class UserService {
       password,
     );
 
-    return { user, password };
-    // return sanitizeUser(user);
+    return sanitizeUser(user);
   }
 
   async studentRegister(
