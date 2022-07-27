@@ -36,12 +36,15 @@ export class StudentProfile
   @Column({ length: 36 })
   userId: string;
 
+  @IsNotEmpty()
   @Column({ length: 255 })
   firstName: string;
 
+  @IsNotEmpty()
   @Column({ length: 255 })
   lastName: string;
 
+  @IsNotEmpty()
   @Column({
     length: 255,
     unique: true,
@@ -52,7 +55,7 @@ export class StudentProfile
   tel: string;
 
   @IsNotEmpty()
-  @Column({ nullable: true })
+  @Column({ unique: true })
   githubUsername: string;
 
   @OneToOne(() => StudentGrades)
@@ -76,7 +79,7 @@ export class StudentProfile
   expectedTypeWork: ExpectedTypeWork;
 
   @IsNotEmpty()
-  @Column({ nullable: true, length: 50 })
+  @Column({ nullable: true, length: 30 })
   targetWorkCity: string;
 
   @IsNotEmpty()
@@ -88,7 +91,7 @@ export class StudentProfile
   expectedSalary: number;
 
   @IsNotEmpty()
-  @Column()
+  @Column({ default: true })
   canTakeApprenticeship: boolean;
 
   @IsNotEmpty()
