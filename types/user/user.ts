@@ -10,6 +10,11 @@ export interface UserData {
   role: Role;
   email: string;
   password: string;
+  salt: string;
+  registerToken: string | null;
 }
 
-export type UserRes = Omit<UserData, 'password' | 'isActive'>;
+export type UserRes = Omit<
+  UserData,
+  'password' | 'isActive' | 'salt' | 'registerToken'
+>;

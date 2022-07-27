@@ -28,29 +28,27 @@ export enum ExpectedContractType {
 }
 
 export interface StudentProfileRegister {
-  email: string;
   tel: string | null;
-  firstName: string;
-  lastName: string;
   githubUsername: string;
-  portfolioUrls: URL[] | [];
+  portfolioUrls: URL[] | null;
   projectUrls: URL[];
   bio: string | null;
   expectedTypeWork: ExpectedTypeWork;
   targetWorkCity: string | null;
   expectedContractType: ExpectedContractType;
-  expectedSalary: number | null;
+  expectedSalary: string | null;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
-  education: string;
-  workExperience: string;
-  courses: string;
+  education: string | null;
+  workExperience: string | null;
+  courses: string | null;
 }
 
 export interface StudentData
   extends ImportedStudentData,
     Omit<StudentProfileRegister, 'email'> {
   id: string;
+  userId: string;
   status: StudentStatus;
 }
 
