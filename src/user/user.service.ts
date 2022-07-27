@@ -37,13 +37,14 @@ export class UserService {
     const salt = uuid();
     const password = uuid();
     const userId = uuid();
-    
+    const registerToken = uuid();
+
     user.id = userId;
     user.email = email;
     user.password = user.password = hashPwd(password, salt);
     user.role = Role.HR;
     user.salt = salt;
-    user.registerToken = uuid();
+    user.registerToken = registerToken;
 
     const profile = new HrProfile();
     profile.firstName = firstName;
@@ -87,7 +88,7 @@ export class UserService {
     );
 
     return validateImportedStudentList;
-    
+
     // async studentRegister(): Promise<UserRes> {
     //   //TUTAJ MUSISZ ZROBIĆ VALIDACJĘ POD KONTEM @ W EMAILU
 

@@ -32,19 +32,15 @@ export class StudentProfile
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @IsNotEmpty()
   @Column({ length: 36 })
   userId: string;
 
-  @IsNotEmpty()
   @Column({ length: 255 })
   firstName: string;
 
-  @IsNotEmpty()
   @Column({ length: 255 })
   lastName: string;
 
-  @IsNotEmpty()
   @Column({
     length: 255,
     unique: true,
@@ -54,7 +50,6 @@ export class StudentProfile
   @Column({ nullable: true, length: 9 })
   tel: string;
 
-  @IsNotEmpty()
   @Column({ unique: true })
   githubUsername: string;
 
@@ -74,27 +69,21 @@ export class StudentProfile
   @Column({ nullable: true, length: 1000 })
   bio: string;
 
-  @IsNotEmpty()
   @Column({ nullable: true })
   expectedTypeWork: ExpectedTypeWork;
 
-  @IsNotEmpty()
   @Column({ nullable: true, length: 30 })
   targetWorkCity: string;
 
-  @IsNotEmpty()
   @Column()
   expectedContractType: ExpectedContractType;
 
-  @IsNotEmpty()
   @Column({ nullable: true, length: 5 })
   expectedSalary: string;
 
-  @IsNotEmpty()
-  @Column({ default: 'false' })
+  @Column({ default: false })
   canTakeApprenticeship: boolean;
 
-  @IsNotEmpty()
   @Column({ type: 'tinyint', default: 0 })
   monthsOfCommercialExp: number;
 

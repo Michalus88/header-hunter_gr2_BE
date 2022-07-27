@@ -14,15 +14,12 @@ export class HrProfile extends BaseEntity implements HrProfileRegister {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @IsNotEmpty()
   @Column({ length: 36 })
   userId: string;
 
-  @IsNotEmpty()
   @Column({ length: 255 })
   firstName: string;
 
-  @IsNotEmpty()
   @Column({ length: 255 })
   lastName: string;
 
@@ -32,13 +29,11 @@ export class HrProfile extends BaseEntity implements HrProfileRegister {
   })
   email: string;
 
-  @IsNotEmpty()
   @Column({
     length: 255,
   })
   company: string;
 
-  @IsNotEmpty()
   @Column({
     type: 'smallint',
   })
