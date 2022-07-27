@@ -31,7 +31,6 @@ export class UserService {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
     await this.checkingEmailAvailability(email);
-    console.log(process.env.SENDGRID_USER_NAME);
     const user = new User();
     const salt = uuid();
     const password = uuid();
