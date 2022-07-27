@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { HrModule } from './hr/hr.module';
 import { StudentModule } from './student/student.module';
 import { User } from './user/user.entity';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { User } from './user/user.entity';
     AuthModule,
     HrModule,
     StudentModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
