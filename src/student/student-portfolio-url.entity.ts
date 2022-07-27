@@ -14,7 +14,7 @@ export class StudentPortfolioUrl extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255 })
+  @Column({ nullable: true, length: 255 })
   url: string;
 
   @ManyToOne((type) => StudentProfile, (entity) => entity.portfolioUrls)
