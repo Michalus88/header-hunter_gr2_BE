@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { User } from './user.entity';
 import { hashPwd } from '../utils/hash-pwd';
-import { Role, UserRes, ImportedStudentData } from 'types';
+import { Role, ImportedStudentData } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 
 import {
@@ -13,9 +13,12 @@ import {
 } from 'src/utils/csvParse';
 import { storageDir } from 'src/utils/storage';
 import { MulterDiskUploadedFiles } from 'src/interfaces';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
+  constructor(private mailService: MailService) {}
+
   async getByEmail(email: string): Promise<User | null> {
     return await User.findOne({
       where: {
@@ -28,11 +31,13 @@ export class UserService {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
     await this.checkingEmailAvailability(email);
-
+    console.log(process.env.SENDGRID_USER_NAME);
     const user = new User();
     const salt = uuid();
     const password = uuid();
     const registerToken = uuid();
+    const userId = uuid();
+    user.id = userId;
     user.email = email;
     user.password = user.password = hashPwd(password, salt);
     user.firstName = firstName;
@@ -42,6 +47,14 @@ export class UserService {
     user.registerToken = registerToken;
 
     await user.save();
+
+    await this.mailService.sendActivateLink(
+      email,
+      userId,
+      registerToken,
+      password,
+    );
+
     return { user, password };
     // return sanitizeUser(user);
   }
