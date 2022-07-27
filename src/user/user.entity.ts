@@ -1,6 +1,5 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Role, UserData } from 'types';
-import { IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class User extends BaseEntity implements UserData {
@@ -23,14 +22,12 @@ export class User extends BaseEntity implements UserData {
   })
   password: string;
 
-  @IsNotEmpty()
   @Column({
     type: 'enum',
     enum: Role,
   })
   role: Role;
 
-  @IsNotEmpty()
   @Column({
     length: 255,
   })

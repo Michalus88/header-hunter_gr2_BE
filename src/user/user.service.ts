@@ -4,19 +4,23 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { User } from './user.entity';
 import { hashPwd } from '../utils/hash-pwd';
-import { Role, UserRes, ImportedStudentData } from 'types';
+import { Role, ImportedStudentData } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 import { HrProfile } from '../hr/hr-profile.entity';
 
 import {
   papaparseToArrOfObj,
-  validateImportedStudentDatas,
+  validateImportedStudentData,
 } from 'src/utils/csvParse';
 import { storageDir } from 'src/utils/storage';
 import { MulterDiskUploadedFiles } from 'src/interfaces';
+import { MailService } from '../mail/mail.service';
+import { sanitizeUser } from '../utils/sanitize-user';
 
 @Injectable()
 export class UserService {
+  constructor(private mailService: MailService) {}
+
   async getByEmail(email: string): Promise<User | null> {
     return await User.findOne({
       where: {
@@ -29,10 +33,12 @@ export class UserService {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
     await this.checkingEmailAvailability(email);
-
     const user = new User();
     const salt = uuid();
     const password = uuid();
+    const userId = uuid();
+    
+    user.id = userId;
     user.email = email;
     user.password = user.password = hashPwd(password, salt);
     user.role = Role.HR;
@@ -48,8 +54,15 @@ export class UserService {
 
     await user.save();
     await profile.save();
-    return { user, password };
-    // return sanitizeUser(user);
+
+    await this.mailService.sendActivateLink(
+      email,
+      userId,
+      registerToken,
+      password,
+    );
+
+    return sanitizeUser(user);
   }
 
   async studentRegister(
@@ -69,7 +82,7 @@ export class UserService {
       throw e2;
     }
 
-    const validateImportedStudentList = validateImportedStudentDatas(
+    const validateImportedStudentList = validateImportedStudentData(
       papaparseToArrOfObj(csvText),
     );
 

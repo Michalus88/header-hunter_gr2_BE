@@ -7,7 +7,7 @@ export enum StudentStatus {
 export interface ImportedStudentData {
   email: string;
   courseCompletion: number;
-  courseEngagment: number;
+  courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls: URL[];
