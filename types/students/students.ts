@@ -7,7 +7,7 @@ export enum StudentStatus {
 export interface ImportedStudentData {
   email: string;
   courseCompletion: number;
-  courseEngagement: number;
+  courseEngagment: number;
   projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls: URL[];
@@ -36,7 +36,7 @@ export interface StudentProfileRegister {
   expectedTypeWork: ExpectedTypeWork;
   targetWorkCity: string | null;
   expectedContractType: ExpectedContractType;
-  expectedSalary: number | null;
+  expectedSalary: string | null;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
   education: string | null;

@@ -87,15 +87,15 @@ export class StudentProfile
   expectedContractType: ExpectedContractType;
 
   @IsNotEmpty()
-  @Column({ nullable: true })
-  expectedSalary: number;
+  @Column({ nullable: true, length: 5 })
+  expectedSalary: string;
 
   @IsNotEmpty()
-  @Column({ default: true })
+  @Column({ default: 'false' })
   canTakeApprenticeship: boolean;
 
   @IsNotEmpty()
-  @Column({ default: 0 })
+  @Column({ type: 'tinyint', default: 0 })
   monthsOfCommercialExp: number;
 
   @Column({ type: 'multilinestring', nullable: true })
