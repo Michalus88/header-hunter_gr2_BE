@@ -12,8 +12,8 @@ import {
   ExpectedContractType,
   ExpectedTypeWork,
   StudentProfileRegister,
+  StudentStatus,
 } from 'types';
-import { IsNotEmpty } from 'class-validator';
 import { StudentProjectUrl } from './student-project-url.entity';
 import { StudentGrades } from './student-grades.entity';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
@@ -34,6 +34,13 @@ export class StudentProfile
 
   @Column({ length: 36 })
   userId: string;
+
+  @Column({
+    type: 'enum',
+    enum: StudentStatus,
+    default: StudentStatus.AVAILABLE,
+  })
+  status: StudentStatus;
 
   @Column({ length: 255 })
   firstName: string;
