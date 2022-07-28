@@ -47,21 +47,72 @@ export class UserService {
       password,
     );
 
-    return sanitizeUser(user);
+    return {
+      statusCode: 201,
+      message: 'Success.',
+      userId,
+    };
   }
 
-  async studentRegister(
-    files: MulterDiskUploadedFiles,
-  ): Promise<ImportedStudentData[]> {
-    const csvFile = files?.studentsList?.[0] ?? null;
-    let csvText = '';
-    try {
-      if (csvFile) {
-        csvText = String(
-          fs.readFileSync(
-            path.join(storageDir(), 'students-list', csvFile.filename),
-          ),
+  async studentRegister() {
+    const mokStudents: ImportedStudentData[] = [
+      {
+        email: 'michalus88@gmail.com',
+        projectDegree: 4,
+        courseEngagement: 4,
+        teamProjectDegree: 5,
+        courseCompletion: 4.5,
+        bonusProjectUrls: [
+          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/Michalus88/header-hunter_gr2_FE',
+        ],
+      },
+      {
+        email: 'test2@gmail.com',
+        projectDegree: 3,
+        courseEngagement: 4,
+        teamProjectDegree: 5,
+        courseCompletion: 4,
+        bonusProjectUrls: [
+          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/Michalus88/header-hunter_gr2_FE',
+        ],
+      },
+      {
+        email: 'test3@gmail.com',
+        projectDegree: 5,
+        courseEngagement: 5,
+        teamProjectDegree: 5,
+        courseCompletion: 5,
+        bonusProjectUrls: [
+          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/Michalus88/header-hunter_gr2_FE',
+        ],
+      },
+    ];
+    const numberOfStudentsToRegister = mokStudents.length;
+    let numberOfSuccessfullyRegistered = 0;
+    let numberOfEmailsAlreadyRegistered = 0;
+
+    for (const mokStudent of mokStudents) {
+      const user = await this.getByEmail(mokStudent.email);
+
+      if (user) {
+        numberOfEmailsAlreadyRegistered++;
+      } else {
+        numberOfSuccessfullyRegistered++;
+        const { userId, password, registerToken } = await this.saveToUserEntity(
+          mokStudent.email,
+          Role.STUDENT,
         );
+
+        // Wyłączone wysyłanie emaili przy developie
+        // await this.mailService.sendActivateLink(
+        //   mokStudent.email,
+        //   userId,
+        //   registerToken,
+        //   password,
+        // );
       }
     }
 
