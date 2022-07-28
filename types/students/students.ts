@@ -48,7 +48,7 @@ export interface StudentProfileRegister {
 
 export interface StudentData
   extends ImportedStudentData,
-    Omit<StudentProfileRegister, 'email'> {
+    StudentProfileRegister {
   id: string;
   userId: string;
   status: StudentStatus;
