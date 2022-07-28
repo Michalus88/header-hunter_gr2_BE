@@ -10,7 +10,7 @@ export interface ImportedStudentData {
   courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
-  bonusProjectUrls: URL[];
+  bonusProjectUrls: string[];
 }
 
 export enum ExpectedTypeWork {
@@ -30,8 +30,8 @@ export enum ExpectedContractType {
 export interface StudentProfileRegister {
   tel: string | null;
   githubUsername: string;
-  portfolioUrls: URL[] | null;
-  projectUrls: URL[];
+  portfolioUrls: string[] | null;
+  projectUrls: string[];
   bio: string | null;
   expectedTypeWork: ExpectedTypeWork;
   targetWorkCity: string | null;
