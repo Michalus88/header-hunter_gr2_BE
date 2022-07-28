@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { uuid } from 'uuidv4';
-import { User } from './user.entity';
 import { hashPwd } from '../utils/hash-pwd';
-import { ImportedStudentData, Role } from 'types';
-import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
+import { uuid } from 'uuidv4';
+import { sanitizeUser } from '../utils/sanitize-user';
+import { validateActivationCredentials } from '../utils/validate-activation-credentials';
+import { User } from './user.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { MailService } from '../mail/mail.service';
-import { sanitizeUser } from '../utils/sanitize-user';
-import { BonusProjectUrl } from '../student/student-bonus-project-url.entity';
 import { StudentService } from '../student/student.service';
+import { ImportedStudentData, Role } from 'types';
+import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 
 @Injectable()
 export class UserService {
@@ -29,12 +29,10 @@ export class UserService {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
     await this.checkingEmailAvailability(email);
-
     const { userId, password, registerToken } = await this.saveToUserEntity(
       email,
       Role.HR,
     );
-
     const profile = new HrProfile();
     profile.firstName = firstName;
     profile.lastName = lastName;
@@ -42,7 +40,6 @@ export class UserService {
     profile.company = company;
     profile.maxReservedStudents = maxReservedStudents;
     profile.userId = userId;
-
     await profile.save();
 
     await this.mailService.sendActivateLink(
@@ -111,9 +108,9 @@ export class UserService {
           mokStudent.email,
           Role.STUDENT,
         );
-        await this.studentService.addBonusProjectUrls(mokStudent, userId);
+        await this.studentService.saveDataFromCsvToDb(mokStudent, userId);
 
-        // Wyłączone wysyłanie emaili przy developie
+        // Wyłączone wysyłanie emaili przy developmencie
         // await this.mailService.sendActivateLink(
         //   mokStudent.email,
         //   userId,
@@ -176,6 +173,7 @@ export class UserService {
       );
     }
   }
+
   async saveToUserEntity(email: string, role: Role) {
     const user = new User();
     const salt = uuid();
@@ -189,6 +187,7 @@ export class UserService {
     user.role = role;
     user.salt = salt;
     user.registerToken = registerToken;
+
     await user.save();
     return { password, userId, registerToken };
   }
