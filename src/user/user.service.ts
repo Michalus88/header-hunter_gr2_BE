@@ -24,18 +24,11 @@ export class UserService {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
     await this.checkingEmailAvailability(email);
-    const user = new User();
-    const salt = uuid();
-    const password = uuid();
-    const userId = uuid();
-    const registerToken = uuid();
 
-    user.id = userId;
-    user.email = email;
-    user.password = user.password = hashPwd(password, salt);
-    user.role = Role.HR;
-    user.salt = salt;
-    user.registerToken = registerToken;
+    const { userId, password, registerToken } = await this.saveToUserEntity(
+      email,
+      Role.HR,
+    );
 
     const profile = new HrProfile();
     profile.firstName = firstName;
@@ -43,8 +36,8 @@ export class UserService {
     profile.email = email;
     profile.company = company;
     profile.maxReservedStudents = maxReservedStudents;
+    profile.userId = userId;
 
-    await user.save();
     await profile.save();
 
     await this.mailService.sendActivateLink(
@@ -107,5 +100,21 @@ export class UserService {
         'The user with the given email already exists.',
       );
     }
+  }
+  async saveToUserEntity(email: string, role: Role) {
+    const user = new User();
+    const salt = uuid();
+    const password = uuid();
+    const userId = uuid();
+    const registerToken = uuid();
+
+    user.id = userId;
+    user.email = email;
+    user.password = user.password = hashPwd(password, salt);
+    user.role = role;
+    user.salt = salt;
+    user.registerToken = registerToken;
+    await user.save();
+    return { password, userId, registerToken };
   }
 }
