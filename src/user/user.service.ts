@@ -1,16 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { uuid } from 'uuidv4';
-import { User } from './user.entity';
 import { hashPwd } from '../utils/hash-pwd';
-import { ImportedStudentData, Role } from 'types';
-import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
+import { uuid } from 'uuidv4';
+import { sanitizeUser } from '../utils/sanitize-user';
+import { validateActivationCredentials } from '../utils/validate-activation-credentials';
+import { User } from './user.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { MailService } from '../mail/mail.service';
-import { sanitizeUser } from '../utils/sanitize-user';
+import { StudentService } from '../student/student.service';
+import { ImportedStudentData, Role } from 'types';
+import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private mailService: MailService) {}
+  constructor(
+    private mailService: MailService,
+    private studentService: StudentService,
+  ) {}
 
   async getByEmail(email: string): Promise<User | null> {
     return await User.findOne({
@@ -24,12 +29,10 @@ export class UserService {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
     await this.checkingEmailAvailability(email);
-
     const { userId, password, registerToken } = await this.saveToUserEntity(
       email,
       Role.HR,
     );
-
     const profile = new HrProfile();
     profile.firstName = firstName;
     profile.lastName = lastName;
@@ -37,7 +40,6 @@ export class UserService {
     profile.company = company;
     profile.maxReservedStudents = maxReservedStudents;
     profile.userId = userId;
-
     await profile.save();
 
     await this.mailService.sendActivateLink(
@@ -64,7 +66,7 @@ export class UserService {
         courseCompletion: 4.5,
         bonusProjectUrls: [
           'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/Michalus88/header-hunter_gr2_BE',
         ],
       },
       {
@@ -74,8 +76,8 @@ export class UserService {
         teamProjectDegree: 5,
         courseCompletion: 4,
         bonusProjectUrls: [
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/test_FE',
+          'https://github.com/test_BE',
         ],
       },
       {
@@ -86,7 +88,7 @@ export class UserService {
         courseCompletion: 5,
         bonusProjectUrls: [
           'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/Michalus88/header-hunter_gr2_BE',
         ],
       },
     ];
@@ -101,12 +103,14 @@ export class UserService {
         numberOfEmailsAlreadyRegistered++;
       } else {
         numberOfSuccessfullyRegistered++;
+
         const { userId, password, registerToken } = await this.saveToUserEntity(
           mokStudent.email,
           Role.STUDENT,
         );
+        await this.studentService.saveDataFromCsvToDb(mokStudent, userId);
 
-        // Wyłączone wysyłanie emaili przy developie
+        // Wyłączone wysyłanie emaili przy developmencie
         // await this.mailService.sendActivateLink(
         //   mokStudent.email,
         //   userId,
@@ -145,6 +149,23 @@ export class UserService {
     //   return validateImportedStudentList;
   }
 
+  async accountActivation(userId: string, registerToken: string) {
+    const user = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    validateActivationCredentials(user, registerToken);
+    if (user.role === Role.HR) {
+      user.isActive = true;
+      user.registerToken = null;
+      await user.save();
+    }
+
+    return sanitizeUser(user);
+  }
+
   async checkingEmailAvailability(email) {
     if (await this.getByEmail(email)) {
       throw new BadRequestException(
@@ -152,6 +173,7 @@ export class UserService {
       );
     }
   }
+
   async saveToUserEntity(email: string, role: Role) {
     const user = new User();
     const salt = uuid();
@@ -165,6 +187,7 @@ export class UserService {
     user.role = role;
     user.salt = salt;
     user.registerToken = registerToken;
+
     await user.save();
     return { password, userId, registerToken };
   }

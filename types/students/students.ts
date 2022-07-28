@@ -28,20 +28,22 @@ export enum ExpectedContractType {
 }
 
 export interface StudentProfileRegister {
-  tel: string | null;
+  tel: string | undefined;
+  firstName: string;
+  lastName: string;
   githubUsername: string;
-  portfolioUrls: string[] | null;
+  portfolioUrls: string[] | undefined;
   projectUrls: string[];
-  bio: string | null;
+  bio: string | undefined;
   expectedTypeWork: ExpectedTypeWork;
-  targetWorkCity: string | null;
+  targetWorkCity: string | undefined;
   expectedContractType: ExpectedContractType;
-  expectedSalary: string | null;
+  expectedSalary: string | undefined;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
-  education: string | null;
-  workExperience: string | null;
-  courses: string | null;
+  education: string | undefined;
+  workExperience: string | undefined;
+  courses: string | undefined;
 }
 
 export interface StudentData

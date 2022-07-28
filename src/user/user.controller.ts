@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -25,6 +27,14 @@ export class UserController {
   @Post('/student')
   studentRegister() {
     return this.userService.studentRegister();
+  }
+
+  @Get('/student/activate/:userId/:registerToken')
+  accountActivation(
+    @Param('userId') userId: string,
+    @Param('registerToken') registerToken: string,
+  ) {
+    return this.userService.accountActivation(userId, registerToken);
   }
 
   // @Post('/student')

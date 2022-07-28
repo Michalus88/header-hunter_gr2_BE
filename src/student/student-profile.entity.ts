@@ -66,19 +66,19 @@ export class StudentProfile
   @OneToMany(() => BonusProjectUrl, (entity) => entity.studentProfile)
   bonusProjectUrls: BonusProjectUrl[];
 
-  @Column({ nullable: true, length: 1000 })
+  @Column({ nullable: true, length: 1000, default: null })
   bio: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: null })
   expectedTypeWork: ExpectedTypeWork;
 
-  @Column({ nullable: true, length: 30 })
+  @Column({ nullable: true, length: 30, default: null })
   targetWorkCity: string;
 
   @Column()
   expectedContractType: ExpectedContractType;
 
-  @Column({ nullable: true, length: 5 })
+  @Column({ nullable: true, length: 5, default: null })
   expectedSalary: string;
 
   @Column({ default: false })
@@ -87,13 +87,13 @@ export class StudentProfile
   @Column({ type: 'tinyint', default: 0 })
   monthsOfCommercialExp: number;
 
-  @Column({ type: 'multilinestring', nullable: true })
+  @Column({ type: 'multilinestring', nullable: true, default: null })
   education: string;
 
-  @Column({ type: 'multilinestring', nullable: true })
+  @Column({ type: 'multilinestring', nullable: true, default: null })
   workExperience: string;
 
-  @Column({ type: 'multilinestring', nullable: true })
+  @Column({ type: 'multilinestring', nullable: true, default: null })
   courses: string;
 
   @ManyToOne((type) => HrProfile, (entity) => entity.reservedStudents)

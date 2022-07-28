@@ -17,6 +17,9 @@ export class StudentGrades
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ length: 36 })
+  userId: string;
+
   @Column({ type: 'float', precision: 3, scale: 2 })
   courseCompletion: number;
 
