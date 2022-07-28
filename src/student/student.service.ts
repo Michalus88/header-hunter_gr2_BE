@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { ImportedStudentData } from 'types';
+import { ImportedStudentData, StudentStatus } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
@@ -11,6 +11,15 @@ import { StudentGrades } from './student-grades.entity';
 
 @Injectable()
 export class StudentService {
+  async getAvailable() {
+    const availableStudents = await StudentProfile.find({
+      relations: ['grades', 'projectUrls', 'bonusProjectUrls', 'portfolioUrls'],
+      where: { status: StudentStatus.AVAILABLE },
+    });
+
+    return availableStudents;
+  }
+
   async saveDataFromCsvToDb(student: ImportedStudentData, userId: string) {
     for (const url of student.bonusProjectUrls) {
       const bonusProjectUrl = new BonusProjectUrl();
@@ -35,7 +44,6 @@ export class StudentService {
   ) {
     const user = await User.findOne({ where: { id: userId } });
     validateActivationCredentials(user, registerToken);
-
     const {
       tel,
       firstName,
@@ -59,7 +67,7 @@ export class StudentService {
         userId: userId,
       },
     });
-    console.log(studentGrades);
+
     const profile = new StudentProfile();
     profile.userId = userId;
     profile.email = user.email;
