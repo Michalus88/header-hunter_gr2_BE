@@ -152,6 +152,23 @@ export class UserService {
     //   return validateImportedStudentList;
   }
 
+  async accountActivation(userId: string, registerToken: string) {
+    const user = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    validateActivationCredentials(user, registerToken);
+    if (user.role === Role.HR) {
+      user.isActive = true;
+      user.registerToken = null;
+      await user.save();
+    }
+
+    return sanitizeUser(user);
+  }
+
   async checkingEmailAvailability(email) {
     if (await this.getByEmail(email)) {
       throw new BadRequestException(
