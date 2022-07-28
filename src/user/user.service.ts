@@ -69,7 +69,7 @@ export class UserService {
         courseCompletion: 4.5,
         bonusProjectUrls: [
           'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/Michalus88/header-hunter_gr2_BE',
         ],
       },
       {
@@ -79,8 +79,8 @@ export class UserService {
         teamProjectDegree: 5,
         courseCompletion: 4,
         bonusProjectUrls: [
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/test_FE',
+          'https://github.com/test_BE',
         ],
       },
       {
@@ -91,7 +91,7 @@ export class UserService {
         courseCompletion: 5,
         bonusProjectUrls: [
           'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
+          'https://github.com/Michalus88/header-hunter_gr2_BE',
         ],
       },
     ];
