@@ -23,20 +23,25 @@ export class UserController {
   }
 
   @Post('/student')
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        {
-          name: 'studentsList',
-          maxCount: 1,
-        },
-      ],
-      { storage: multerStorage(path.join(storageDir(), 'students-list')) },
-    ),
-  )
-  studentRegister(
-    @UploadedFiles() files: MulterDiskUploadedFiles,
-  ): Promise<ImportedStudentData[]> {
-    return this.userService.studentRegister(files);
+  studentRegister() {
+    return this.userService.studentRegister();
   }
+
+  // @Post('/student')
+  // @UseInterceptors(
+  //   FileFieldsInterceptor(
+  //     [
+  //       {
+  //         name: 'studentsList',
+  //         maxCount: 1,
+  //       },
+  //     ],
+  //     { storage: multerStorage(path.join(storageDir(), 'students-list')) },
+  //   ),
+  // )
+  // studentRegister(
+  //   @UploadedFiles() files: MulterDiskUploadedFiles,
+  // ): Promise<ImportedStudentData[]> {
+  //   return this.userService.studentRegister(files);
+  // }
 }
