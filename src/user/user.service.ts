@@ -7,10 +7,15 @@ import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { MailService } from '../mail/mail.service';
 import { sanitizeUser } from '../utils/sanitize-user';
+import { BonusProjectUrl } from '../student/student-bonus-project-url.entity';
+import { StudentService } from '../student/student.service';
 
 @Injectable()
 export class UserService {
-  constructor(private mailService: MailService) {}
+  constructor(
+    private mailService: MailService,
+    private studentService: StudentService,
+  ) {}
 
   async getByEmail(email: string): Promise<User | null> {
     return await User.findOne({
@@ -101,10 +106,12 @@ export class UserService {
         numberOfEmailsAlreadyRegistered++;
       } else {
         numberOfSuccessfullyRegistered++;
+
         const { userId, password, registerToken } = await this.saveToUserEntity(
           mokStudent.email,
           Role.STUDENT,
         );
+        await this.studentService.addBonusProjectUrls(mokStudent, userId);
 
         // Wyłączone wysyłanie emaili przy developie
         // await this.mailService.sendActivateLink(
