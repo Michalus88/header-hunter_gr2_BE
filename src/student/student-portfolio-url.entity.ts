@@ -2,12 +2,10 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
-import { StudentProfile } from './student-profile.entity';
+import { StudentInfo } from './student-info.entity';
 
 @Entity()
 export class StudentPortfolioUrl extends BaseEntity {
@@ -17,7 +15,6 @@ export class StudentPortfolioUrl extends BaseEntity {
   @Column({ nullable: true, length: 255 })
   url: string;
 
-  @ManyToOne((type) => StudentProfile, (entity) => entity.portfolioUrls)
-  @JoinColumn()
-  studentProfile: StudentProfile;
+  @ManyToOne((type) => StudentInfo, (entity) => entity.portfolioUrls)
+  studentInfo: StudentInfo;
 }

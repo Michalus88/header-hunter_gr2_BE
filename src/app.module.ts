@@ -13,9 +13,8 @@ import { StudentProfile } from './student/student-profile.entity';
 import { StudentProjectUrl } from './student/student-project-url.entity';
 import { StudentPortfolioUrl } from './student/student-portfolio-url.entity';
 import { BonusProjectUrl } from './student/student-bonus-project-url.entity';
-import { StudentGrades } from './student/student-grades.entity';
 import { HrProfile } from './hr/hr-profile.entity';
-
+import { StudentInfo } from './student/student-info.entity';
 
 @Module({
   imports: [
@@ -30,9 +29,9 @@ import { HrProfile } from './hr/hr-profile.entity';
         BonusProjectUrl,
         HrProfile,
         User,
-        StudentGrades,
         StudentPortfolioUrl,
         StudentProfile,
+        StudentInfo,
         StudentProjectUrl,
       ],
       bigNumberStrings: false,

@@ -14,26 +14,23 @@ import {
   StudentProfileRegister,
   StudentStatus,
 } from 'types';
-import { StudentProjectUrl } from './student-project-url.entity';
-import { StudentGrades } from './student-grades.entity';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { StudentPortfolioUrl } from './student-portfolio-url.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
+import { User } from '../user/user.entity';
+import { StudentInfo } from './student-info.entity';
 
 @Entity()
-export class StudentProfile
-  extends BaseEntity
-  implements
-    Omit<
-      StudentProfileRegister,
-      'portfolioUrls' | 'bonusProjectUrls' | 'projectUrls'
-    >
-{
+export class StudentProfile extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 36 })
-  userId: string;
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
+
+  @OneToOne(() => StudentInfo)
+  @JoinColumn()
+  studentInfo: StudentInfo;
 
   @Column({
     type: 'enum',
@@ -42,68 +39,24 @@ export class StudentProfile
   })
   status: StudentStatus;
 
-  @Column({ length: 255 })
-  firstName: string;
+  @Column({ type: 'float', precision: 3, scale: 2 })
+  courseCompletion: number;
 
-  @Column({ length: 255 })
-  lastName: string;
+  @Column({ type: 'float', precision: 3, scale: 2 })
+  courseEngagement: number;
 
-  @Column({
-    length: 255,
-    unique: true,
-  })
-  email: string;
+  @Column({ type: 'float', precision: 3, scale: 2 })
+  projectDegree: number;
 
-  @Column({ nullable: true, length: 9 })
-  tel: string;
-
-  @Column({ unique: true })
-  githubUsername: string;
-
-  @OneToOne(() => StudentGrades)
-  @JoinColumn()
-  grades: StudentGrades;
-
-  @OneToMany(() => StudentPortfolioUrl, (entity) => entity.studentProfile)
-  portfolioUrls: StudentPortfolioUrl[];
-
-  @OneToMany(() => StudentProjectUrl, (entity) => entity.studentProfile)
-  projectUrls: StudentProjectUrl[];
+  @Column({ type: 'float', precision: 3, scale: 2 })
+  teamProjectDegree: number;
 
   @OneToMany(() => BonusProjectUrl, (entity) => entity.studentProfile)
   bonusProjectUrls: BonusProjectUrl[];
 
-  @Column({ nullable: true, length: 1000, default: null })
-  bio: string;
-
-  @Column({ nullable: true, default: null })
-  expectedTypeWork: ExpectedTypeWork;
-
-  @Column({ nullable: true, length: 30, default: null })
-  targetWorkCity: string;
-
-  @Column()
-  expectedContractType: ExpectedContractType;
-
-  @Column({ nullable: true, length: 5, default: null })
-  expectedSalary: string;
-
-  @Column({ default: false })
-  canTakeApprenticeship: boolean;
-
-  @Column({ type: 'tinyint', default: 0 })
-  monthsOfCommercialExp: number;
-
-  @Column({ type: 'multilinestring', nullable: true, default: null })
-  education: string;
-
-  @Column({ type: 'multilinestring', nullable: true, default: null })
-  workExperience: string;
-
-  @Column({ type: 'multilinestring', nullable: true, default: null })
-  courses: string;
+  @Column({ type: 'timestamp', nullable: true })
+  bookingDate: Date;
 
   @ManyToOne((type) => HrProfile, (entity) => entity.reservedStudents)
-  @JoinColumn()
   hrProfile: HrProfile;
 }
