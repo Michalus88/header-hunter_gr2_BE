@@ -1,4 +1,4 @@
-import { StudentRes } from '../students';
+import { StudentDataRes } from '../students';
 
 export interface HrProfileRegister {
   email: string;
@@ -10,5 +10,5 @@ export interface HrProfileRegister {
 
 export interface HrRes extends HrProfileRegister {
   id: string;
-  reservedStudents: StudentRes[] | null;
+  reservedStudents: StudentDataRes[] | null;
 }

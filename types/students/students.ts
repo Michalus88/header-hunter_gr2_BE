@@ -46,12 +46,22 @@ export interface StudentProfileRegister {
   courses: string | undefined;
 }
 
-export interface StudentData
+export interface AvailableStudentRes
+  extends Omit<ImportedStudentData, 'email' | 'bonusProjectUrls'>,
+    Pick<
+      StudentProfileRegister,
+      | 'expectedTypeWork'
+      | 'targetWorkCity'
+      | 'expectedContractType'
+      | 'expectedSalary'
+      | 'canTakeApprenticeship'
+      | 'workExperience'
+    > {}
+
+export interface StudentDataRes
   extends ImportedStudentData,
     StudentProfileRegister {
   id: string;
   userId: string;
   status: StudentStatus;
 }
-
-export type StudentRes = Omit<StudentData, 'password'>;
