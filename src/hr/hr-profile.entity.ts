@@ -2,32 +2,36 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 import { HrProfileRegister } from 'types';
 import { StudentProfile } from '../student/student-profile.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
-export class HrProfile extends BaseEntity implements HrProfileRegister {
+export class HrProfile
+  extends BaseEntity
+  implements Omit<HrProfileRegister, 'email'>
+{
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 36 })
-  userId: string;
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 
-  @Column({ length: 255 })
+  @Column({ unique: true })
+  email: string;
+
+  @Column({ length: 80 })
   firstName: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 80 })
   lastName: string;
-
-  @Column({
-    length: 255,
-    unique: true,
-  })
-  email: string;
 
   @Column({
     length: 255,

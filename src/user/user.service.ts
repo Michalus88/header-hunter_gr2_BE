@@ -18,18 +18,14 @@ export class UserService {
   ) {}
 
   async getByEmail(email: string): Promise<User | null> {
-    return await User.findOne({
-      where: {
-        email,
-      },
-    });
+    return await User.findOneBy({ email });
   }
 
   async hrRegister(hrRegisterDto: HrRegisterDto) {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
     await this.checkingEmailAvailability(email);
-    const { userId, password, registerToken } = await this.saveToUserEntity(
+    const { user, password, registerToken } = await this.saveToUserEntity(
       email,
       Role.HR,
     );
@@ -39,12 +35,12 @@ export class UserService {
     profile.email = email;
     profile.company = company;
     profile.maxReservedStudents = maxReservedStudents;
-    profile.userId = userId;
+    profile.user = user;
     await profile.save();
 
     await this.mailService.sendActivateLink(
       email,
-      userId,
+      user.id,
       registerToken,
       password,
     );
@@ -52,7 +48,7 @@ export class UserService {
     return {
       statusCode: 201,
       message: 'Success.',
-      userId,
+      userId: user.id,
     };
   }
 
@@ -103,12 +99,11 @@ export class UserService {
         numberOfEmailsAlreadyRegistered++;
       } else {
         numberOfSuccessfullyRegistered++;
-
-        const { userId, password, registerToken } = await this.saveToUserEntity(
+        const { user, password, registerToken } = await this.saveToUserEntity(
           mokStudent.email,
           Role.STUDENT,
         );
-        await this.studentService.saveDataFromCsvToDb(mokStudent, userId);
+        await this.studentService.saveDataFromCsvToDb(mokStudent, user);
 
         // Wyłączone wysyłanie emaili przy developmencie
         // await this.mailService.sendActivateLink(
@@ -150,11 +145,7 @@ export class UserService {
   }
 
   async accountActivation(userId: string, registerToken: string) {
-    const user = await User.findOne({
-      where: {
-        id: userId,
-      },
-    });
+    const user = await User.findOneBy({ id: userId });
 
     validateActivationCredentials(user, registerToken);
     if (user.role === Role.HR) {
@@ -189,6 +180,6 @@ export class UserService {
     user.registerToken = registerToken;
 
     await user.save();
-    return { password, userId, registerToken };
+    return { password, user, registerToken };
   }
 }

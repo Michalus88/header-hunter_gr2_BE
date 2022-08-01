@@ -7,8 +7,8 @@ export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
   @Get('/available')
-  getAvailable() {
-    return this.studentService.getAvailable();
+  getAllAvailable() {
+    return this.studentService.getAllAvailable();
   }
 
   @Post('/activate/:userId/:registerToken')

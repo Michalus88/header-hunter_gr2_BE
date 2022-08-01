@@ -1,39 +1,85 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { ImportedStudentData, StudentStatus } from 'types';
+import { AvailableStudentRes, ImportedStudentData, StudentStatus } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
 import { StudentProjectUrl } from './student-project-url.entity';
 import { User } from '../user/user.entity';
 import { validateActivationCredentials } from '../utils/validate-activation-credentials';
-import { StudentGrades } from './student-grades.entity';
+import { HrProfile } from '../hr/hr-profile.entity';
+import { DataSource } from 'typeorm';
+import { StudentInfo } from './student-info.entity';
 
 @Injectable()
 export class StudentService {
-  async getAvailable() {
-    const availableStudents = await StudentProfile.find({
-      relations: ['grades', 'projectUrls', 'bonusProjectUrls', 'portfolioUrls'],
-      where: { status: StudentStatus.AVAILABLE },
-    });
+  constructor(private dataSource: DataSource) {}
 
-    return availableStudents;
+  async getAllAvailable() {
+    return this.dataSource
+      .createQueryBuilder()
+      .select([
+        'student.id',
+        'student.courseCompletion',
+        'student.courseEngagement',
+        'student.projectDegree',
+        'student.teamProjectDegree',
+        'sInfo.firstName',
+        'sInfo.lastName',
+        'sInfo.expectedTypeWork',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.canTakeApprenticeship',
+        'sInfo.monthsOfCommercialExp',
+      ])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .leftJoin('student.hrProfile', 'hrProfile')
+      .where('user.isActive = true AND student.hrProfileId = hrProfile.id')
+      .getMany();
   }
 
-  async saveDataFromCsvToDb(student: ImportedStudentData, userId: string) {
+  async isStudentBooked(studentId: string) {
+    const studentProfile = await StudentProfile.findOneBy({ id: studentId });
+    if (!studentProfile) {
+      throw new BadRequestException(
+        `The user with the id: ${studentId} do not exists.`,
+      );
+    }
+    if (studentProfile.status === StudentStatus.HIRED) {
+      throw new ForbiddenException('This student is already hired.');
+    }
+    if (studentProfile.bookingDate) {
+      throw new ForbiddenException(
+        `The Student with the id: ${studentId} is already booked.`,
+      );
+    }
+    return studentProfile;
+  }
+
+  // async getBookedStudents(user: User) {}
+
+  async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
+    const studentProfile = new StudentProfile();
+    studentProfile.user = user;
+    studentProfile.courseCompletion = student.courseCompletion;
+    studentProfile.courseEngagement = student.courseEngagement;
+    studentProfile.projectDegree = student.projectDegree;
+    studentProfile.teamProjectDegree = student.teamProjectDegree;
+    await studentProfile.save();
+
     for (const url of student.bonusProjectUrls) {
       const bonusProjectUrl = new BonusProjectUrl();
-      bonusProjectUrl.userId = userId;
+      bonusProjectUrl.studentProfile = studentProfile;
       bonusProjectUrl.url = url;
       await bonusProjectUrl.save();
-
-      const studentGrades = new StudentGrades();
-      studentGrades.userId = userId;
-      studentGrades.courseCompletion = student.courseCompletion;
-      studentGrades.courseEngagement = student.courseEngagement;
-      studentGrades.projectDegree = student.projectDegree;
-      studentGrades.teamProjectDegree = student.teamProjectDegree;
-      await studentGrades.save();
     }
   }
 
@@ -42,8 +88,14 @@ export class StudentService {
     userId: string,
     registerToken: string,
   ) {
-    const user = await User.findOne({ where: { id: userId } });
+    const user = await User.findOneBy({ id: userId });
     validateActivationCredentials(user, registerToken);
+    const studentProfile = await this.dataSource
+      .createQueryBuilder()
+      .select('studentProfile')
+      .from(StudentProfile, 'studentProfile')
+      .where('studentProfile.userId = :userId ', { userId })
+      .getOne();
     const {
       tel,
       firstName,
@@ -62,60 +114,50 @@ export class StudentService {
       workExperience,
       monthsOfCommercialExp,
     } = studentProfileActivation;
-    const studentGrades = await StudentGrades.findOne({
-      where: {
-        userId: userId,
-      },
-    });
 
-    const profile = new StudentProfile();
-    profile.userId = userId;
-    profile.email = user.email;
-    profile.tel = tel ?? null;
-    profile.firstName = firstName;
-    profile.lastName = lastName;
-    profile.githubUsername = githubUsername;
-    profile.grades = studentGrades;
-    profile.bio = bio ?? null;
-    profile.expectedTypeWork = expectedTypeWork;
-    profile.targetWorkCity = targetWorkCity ?? null;
-    profile.expectedContractType = expectedContractType;
-    profile.expectedSalary = expectedSalary ?? null;
-    profile.canTakeApprenticeship = canTakeApprenticeship ?? false;
-    profile.monthsOfCommercialExp = monthsOfCommercialExp ?? 0;
-    profile.education = education ?? null;
-    profile.workExperience = workExperience ?? null;
-    profile.courses = courses ?? null;
-    await profile.save();
+    const studentInfo = new StudentInfo();
+    studentInfo.tel = tel ?? null;
+    studentInfo.firstName = firstName;
+    studentInfo.lastName = lastName;
+    studentInfo.githubUsername = githubUsername;
+    studentInfo.bio = bio ?? null;
+    studentInfo.expectedTypeWork = expectedTypeWork;
+    studentInfo.targetWorkCity = targetWorkCity ?? null;
+    studentInfo.expectedContractType = expectedContractType;
+    studentInfo.expectedSalary = expectedSalary ?? null;
+    studentInfo.canTakeApprenticeship = canTakeApprenticeship ?? false;
+    studentInfo.monthsOfCommercialExp = monthsOfCommercialExp ?? 0;
+    studentInfo.education = education ?? null;
+    studentInfo.workExperience = workExperience ?? null;
+    studentInfo.courses = courses ?? null;
+    await studentInfo.save();
+
+    studentProfile.studentInfo = studentInfo;
+    await studentProfile.save();
 
     const portfolioUrlsEntity = new StudentPortfolioUrl();
     if (portfolioUrls) {
       for (const url of portfolioUrls) {
         portfolioUrlsEntity.url = url;
-        portfolioUrlsEntity.studentProfile = profile;
+        portfolioUrlsEntity.studentInfo = studentInfo;
         await portfolioUrlsEntity.save();
       }
     }
 
     for (const url of projectUrls) {
       const projectUrlsEntity = new StudentProjectUrl();
-      projectUrlsEntity.studentProfile = profile;
+      projectUrlsEntity.studentInfo = studentInfo;
       projectUrlsEntity.url = url;
       await projectUrlsEntity.save();
     }
 
-    const bonusProjectEntities = await BonusProjectUrl.find({
-      where: {
-        userId,
-      },
-    });
-    for (const bonusProjectEntity of bonusProjectEntities) {
-      bonusProjectEntity.studentProfile = profile;
-      await bonusProjectEntity.save();
-    }
-
+    user.registerToken = null;
     user.isActive = true;
     await user.save();
     return { statusCode: 201, message: 'Activation successful' };
   }
+
+  // async getAssignedStudents(hr: HrProfile) {}
+
+  // async getDetailedAssignedStudents(user: User) {}
 }
