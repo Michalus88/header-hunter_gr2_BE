@@ -20,7 +20,35 @@ export class StudentService {
     return availableStudents;
   }
 
-  async saveDataFromCsvToDb(student: ImportedStudentData, userId: string) {
+  async isStudentBooked(studentId: string) {
+    const studentProfile = await StudentProfile.findOneBy({ id: studentId });
+    if (!studentProfile) {
+      throw new BadRequestException(
+        `The user with the id: ${studentId} do not exists.`,
+      );
+    }
+    if (studentProfile.status === StudentStatus.HIRED) {
+      throw new ForbiddenException('This student is already hired.');
+    }
+    if (studentProfile.bookingDate) {
+      throw new ForbiddenException(
+        `The Student with the id: ${studentId} is already booked.`,
+      );
+    }
+    return studentProfile;
+  }
+
+  // async getBookedStudents(user: User) {}
+
+  async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
+    const studentProfile = new StudentProfile();
+    studentProfile.user = user;
+    studentProfile.courseCompletion = student.courseCompletion;
+    studentProfile.courseEngagement = student.courseEngagement;
+    studentProfile.projectDegree = student.projectDegree;
+    studentProfile.teamProjectDegree = student.teamProjectDegree;
+    await studentProfile.save();
+
     for (const url of student.bonusProjectUrls) {
       const bonusProjectUrl = new BonusProjectUrl();
       bonusProjectUrl.userId = userId;
