@@ -8,11 +8,11 @@ import { User } from '../user/user.entity';
 export class HrController {
   constructor(private readonly hrService: HrService) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/profile')
-  getOne(@UserObj() user: User) {
-    return this.hrService.getStudentsForInterview(user);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get('/profile')
+  // getOne(@UserObj() user: User) {
+  //   return this.hrService.getStudentsForInterview(user);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Patch('/booking-student/:studentId')
