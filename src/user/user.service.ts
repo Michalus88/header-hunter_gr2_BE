@@ -7,7 +7,7 @@ import { User } from './user.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { MailService } from '../mail/mail.service';
 import { StudentService } from '../student/student.service';
-import { ImportedStudentData, Role } from 'types';
+import { ImportedStudentData, StudentRegisterResponse, Role } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 
 @Injectable()
@@ -52,62 +52,44 @@ export class UserService {
     };
   }
 
-  async studentRegister() {
-    const mokStudents: ImportedStudentData[] = [
-      {
-        email: 'michalus@gmail.com',
-        projectDegree: 4,
-        courseEngagement: 4,
-        teamProjectDegree: 5,
-        courseCompletion: 4.5,
-        bonusProjectUrls: [
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_BE',
-        ],
+  async studentRegister(
+    students: ImportedStudentData[],
+    incorrectStudentData: {
+      number: 0;
+      emails: [];
+    },
+  ): Promise<StudentRegisterResponse> {
+    const response = {
+      numberOfStudentsToRegister: 0,
+      numberOfSuccessfullyRegistered: 0,
+      emailsAlreadyRegistered: {
+        number: 0,
+        emails: [],
       },
-      {
-        email: 'test2@gmail.com',
-        projectDegree: 3,
-        courseEngagement: 4,
-        teamProjectDegree: 5,
-        courseCompletion: 4,
-        bonusProjectUrls: [
-          'https://github.com/test_FE',
-          'https://github.com/test_BE',
-        ],
+      incorrectStudentData: {
+        number: 0,
+        emails: [],
       },
-      {
-        email: 'test3@gmail.com',
-        projectDegree: 5,
-        courseEngagement: 5,
-        teamProjectDegree: 5,
-        courseCompletion: 5,
-        bonusProjectUrls: [
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_BE',
-        ],
-      },
-    ];
-    const numberOfStudentsToRegister = mokStudents.length;
-    let numberOfSuccessfullyRegistered = 0;
-    let numberOfEmailsAlreadyRegistered = 0;
+    };
 
-    for (const mokStudent of mokStudents) {
-      const user = await this.getByEmail(mokStudent.email);
+    for (const student of students) {
+      response.numberOfStudentsToRegister++;
+      const user = await this.getByEmail(student.email);
 
       if (user) {
-        numberOfEmailsAlreadyRegistered++;
+        response.emailsAlreadyRegistered.number++;
+        response.emailsAlreadyRegistered.emails.push(user.email);
       } else {
-        numberOfSuccessfullyRegistered++;
+        response.numberOfSuccessfullyRegistered++;
         const { user, password, registerToken } = await this.saveToUserEntity(
-          mokStudent.email,
+          student.email,
           Role.STUDENT,
         );
-        await this.studentService.saveDataFromCsvToDb(mokStudent, user);
+        await this.studentService.saveDataFromCsvToDb(student, user);
 
         // Wyłączone wysyłanie emaili przy developmencie
         // await this.mailService.sendActivateLink(
-        //   mokStudent.email,
+        //   student.email,
         //   userId,
         //   registerToken,
         //   password,
@@ -115,33 +97,9 @@ export class UserService {
       }
     }
 
-    return {
-      numberOfStudentsToRegister,
-      numberOfSuccessfullyRegistered,
-      numberOfEmailsAlreadyRegistered,
-    };
+    response.incorrectStudentData = incorrectStudentData;
 
-    //   files: MulterDiskUploadedFiles,
-    // ): Promise<ImportedStudentData[]> {
-    //   const csvFile = files?.studentsList?.[0] ?? null;
-    //   let csvText = '';
-    //   try {
-    //     if (csvFile) {
-    //       csvText = String(
-    //         fs.readFileSync(
-    //           path.join(storageDir(), 'students-list', csvFile.filename),
-    //         ),
-    //       );
-    //     }
-    //   } catch (e2) {
-    //     throw e2;
-    //   }
-    //
-    //   const validateImportedStudentList = validateImportedStudentData(
-    //     papaparseToArrOfObj(csvText),
-    //   );
-    //
-    //   return validateImportedStudentList;
+    return response;
   }
 
   async accountActivation(userId: string, registerToken: string) {

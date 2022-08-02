@@ -18,3 +18,16 @@ export type UserRes = Omit<
   UserData,
   'password' | 'isActive' | 'salt' | 'registerToken'
 >;
+
+export interface StudentRegisterResponse {
+  numberOfStudentsToRegister: number;
+  numberOfSuccessfullyRegistered: number;
+  emailsAlreadyRegistered: {
+    number: number;
+    emails: string[];
+  };
+  incorrectStudentData: {
+    number: number;
+    emails: string[];
+  };
+}
