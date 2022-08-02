@@ -13,9 +13,6 @@ export class BonusProjectUrl extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 36 })
-  userId: string;
-
   @Column({ length: 255 })
   url: string;
 

@@ -19,6 +19,15 @@ export class HrController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/reserved-students/:studentId')
+  getDetailedStudents(
+    @UserObj() user: User,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.studentService.getDetailedStudent(user, studentId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('/booking-student/:studentId')
   getAvailable(@UserObj() user: User, @Param('studentId') studentId: string) {
     return this.hrService.bookingStudent(user, studentId);

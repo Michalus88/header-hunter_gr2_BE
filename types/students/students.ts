@@ -60,12 +60,25 @@ export interface AvailableStudentRes
       | 'expectedSalary'
       | 'canTakeApprenticeship'
       | 'workExperience'
-    > {}
+    > {
+  id: string;
+}
+
+export interface ReservedStudentRes extends AvailableStudentRes {
+  status: StudentStatus;
+  bookingDateTo: Date;
+}
+
+export interface DetailedStudentDataRes
+  extends ImportedStudentData,
+    StudentProfileRegister {
+  status: StudentStatus;
+  user: { email: string };
+}
 
 export interface StudentDataRes
   extends ImportedStudentData,
     StudentProfileRegister {
   id: string;
-  userId: string;
   status: StudentStatus;
 }

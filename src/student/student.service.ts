@@ -156,7 +156,21 @@ export class StudentService {
       .getMany();
   }
 
-  //async getDetailedAssignedStudents(user: User) {}
+  async getDetailedStudent(user: User, studentId: string) {
+    console.log(studentId);
+    return this.dataSource
+      .createQueryBuilder()
+      .select(['student', 'sInfo', 'user.email'])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .leftJoin('student.hrProfile', 'hrProfile')
+      .where('hrProfile.userId = :userId AND student.id = :studentId', {
+        userId: user.id,
+        studentId,
+      })
+      .getOne();
+  }
 
   async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
     const studentProfile = new StudentProfile();
