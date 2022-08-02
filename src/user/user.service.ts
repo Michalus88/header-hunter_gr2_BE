@@ -55,7 +55,7 @@ export class UserService {
   async studentRegister() {
     const mokStudents: ImportedStudentData[] = [
       {
-        email: 'michalus88@gmail.com',
+        email: 'michalus@gmail.com',
         projectDegree: 4,
         courseEngagement: 4,
         teamProjectDegree: 5,
