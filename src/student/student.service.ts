@@ -21,101 +21,6 @@ import { uuid } from 'uuidv4';
 export class StudentService {
   constructor(private dataSource: DataSource) {}
 
-  async getAllAvailable() {
-    return this.dataSource
-      .createQueryBuilder()
-      .select([
-        'student.id',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'sInfo.firstName',
-        'sInfo.lastName',
-        'sInfo.expectedTypeWork',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
-        'sInfo.canTakeApprenticeship',
-        'sInfo.monthsOfCommercialExp',
-      ])
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('user.isActive = true')
-      .getMany();
-  }
-
-  async isStudentBooked(studentId: string) {
-    const studentProfile = await this.dataSource
-      .createQueryBuilder()
-      .select('student')
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .where('student.id = :studentId AND user.isActive = true ', { studentId })
-      .getOne();
-
-    if (!studentProfile) {
-      throw new BadRequestException(
-        `The student with the id: ${studentId} do not exists.`,
-      );
-    }
-    if (studentProfile.status === StudentStatus.HIRED) {
-      throw new ForbiddenException('This student is already hired.');
-    }
-    if (studentProfile.bookingDate) {
-      throw new ForbiddenException(
-        `The Student with the id: ${studentId} is already booked.`,
-      );
-    }
-    return studentProfile;
-  }
-
-  async getReservedStudents(user: User) {
-    return this.dataSource
-      .createQueryBuilder()
-      .select([
-        'student.id',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'sInfo.firstName',
-        'sInfo.lastName',
-        'sInfo.expectedTypeWork',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
-        'sInfo.canTakeApprenticeship',
-        'sInfo.monthsOfCommercialExp',
-      ])
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('hrProfile.userId = :userId ', { userId: user.id })
-      .getMany();
-  }
-
-  async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
-    const studentProfile = new StudentProfile();
-    studentProfile.id = uuid();
-    studentProfile.user = user;
-    studentProfile.courseCompletion = student.courseCompletion;
-    studentProfile.courseEngagement = student.courseEngagement;
-    studentProfile.projectDegree = student.projectDegree;
-    studentProfile.teamProjectDegree = student.teamProjectDegree;
-    await studentProfile.save();
-
-    for (const url of student.bonusProjectUrls) {
-      const bonusProjectUrl = new BonusProjectUrl();
-      bonusProjectUrl.studentProfile = studentProfile;
-      bonusProjectUrl.url = url;
-      await bonusProjectUrl.save();
-    }
-  }
-
   async activateProfile(
     studentProfileActivation: StudentProfileActivationDto,
     userId: string,
@@ -199,7 +104,100 @@ export class StudentService {
     }
   }
 
-  // async getAssignedStudents(hr: HrProfile) {}
+  async getAllAvailable() {
+    return this.dataSource
+      .createQueryBuilder()
+      .select([
+        'student.id',
+        'student.courseCompletion',
+        'student.courseEngagement',
+        'student.projectDegree',
+        'student.teamProjectDegree',
+        'sInfo.firstName',
+        'sInfo.lastName',
+        'sInfo.expectedTypeWork',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.canTakeApprenticeship',
+        'sInfo.monthsOfCommercialExp',
+      ])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .leftJoin('student.hrProfile', 'hrProfile')
+      .where('user.isActive = true')
+      .getMany();
+  }
 
-  // async getDetailedAssignedStudents(user: User) {}
+  async getReservedStudents(user: User) {
+    return this.dataSource
+      .createQueryBuilder()
+      .select([
+        'student.id',
+        'student.courseCompletion',
+        'student.courseEngagement',
+        'student.projectDegree',
+        'student.teamProjectDegree',
+        'sInfo.firstName',
+        'sInfo.lastName',
+        'sInfo.expectedTypeWork',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.canTakeApprenticeship',
+        'sInfo.monthsOfCommercialExp',
+      ])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .leftJoin('student.hrProfile', 'hrProfile')
+      .where('hrProfile.userId = :userId ', { userId: user.id })
+      .getMany();
+  }
+
+  //async getDetailedAssignedStudents(user: User) {}
+
+  async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
+    const studentProfile = new StudentProfile();
+    studentProfile.id = uuid();
+    studentProfile.user = user;
+    studentProfile.courseCompletion = student.courseCompletion;
+    studentProfile.courseEngagement = student.courseEngagement;
+    studentProfile.projectDegree = student.projectDegree;
+    studentProfile.teamProjectDegree = student.teamProjectDegree;
+    await studentProfile.save();
+
+    for (const url of student.bonusProjectUrls) {
+      const bonusProjectUrl = new BonusProjectUrl();
+      bonusProjectUrl.studentProfile = studentProfile;
+      bonusProjectUrl.url = url;
+      await bonusProjectUrl.save();
+    }
+  }
+
+  async isStudentBooked(studentId: string) {
+    const studentProfile = await this.dataSource
+      .createQueryBuilder()
+      .select('student')
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .where('student.id = :studentId AND user.isActive = true ', { studentId })
+      .getOne();
+
+    if (!studentProfile) {
+      throw new BadRequestException(
+        `The student with the id: ${studentId} do not exists.`,
+      );
+    }
+    if (studentProfile.status === StudentStatus.HIRED) {
+      throw new ForbiddenException('This student is already hired.');
+    }
+    if (studentProfile.bookingDate) {
+      throw new ForbiddenException(
+        `The Student with the id: ${studentId} is already booked.`,
+      );
+    }
+    return studentProfile;
+  }
 }

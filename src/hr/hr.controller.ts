@@ -12,11 +12,6 @@ export class HrController {
     private readonly studentService: StudentService,
   ) {}
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get('/profile')
-  // getOne(@UserObj() user: User) {
-  //   return this.hrService.getStudentsForInterview(user);
-  // }
   @UseGuards(JwtAuthGuard)
   @Get('/reserved-students')
   getReservedStudents(@UserObj() user: User) {
