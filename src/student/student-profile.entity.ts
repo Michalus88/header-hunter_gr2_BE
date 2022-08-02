@@ -8,12 +8,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import {
-  ExpectedContractType,
-  ExpectedTypeWork,
-  StudentProfileRegister,
-  StudentStatus,
-} from 'types';
+import { StudentStatus } from 'types';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { User } from '../user/user.entity';

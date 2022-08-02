@@ -1,7 +1,7 @@
 export enum StudentStatus {
-  AVAILABLE = 'available',
-  RESERVED = 'reserved',
-  HIRED = 'hired',
+  AVAILABLE = 1,
+  RESERVED = 2,
+  HIRED = 3,
 }
 
 export interface ImportedStudentData {
@@ -44,6 +44,10 @@ export interface StudentProfileRegister {
   education: string | undefined;
   workExperience: string | undefined;
   courses: string | undefined;
+}
+
+export interface StudentProfileUpdate extends StudentProfileRegister {
+  email: string;
 }
 
 export interface AvailableStudentRes
