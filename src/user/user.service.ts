@@ -54,11 +54,19 @@ export class UserService {
 
   async studentRegister(
     students: ImportedStudentData[],
+    incorrectStudentData: {
+      number: 0;
+      emails: [];
+    },
   ): Promise<StudentRegisterResponse> {
     const response = {
       numberOfStudentsToRegister: 0,
       numberOfSuccessfullyRegistered: 0,
       emailsAlreadyRegistered: {
+        number: 0,
+        emails: [],
+      },
+      incorrectStudentData: {
         number: 0,
         emails: [],
       },
@@ -88,6 +96,8 @@ export class UserService {
         // );
       }
     }
+
+    response.incorrectStudentData = incorrectStudentData;
 
     return response;
   }

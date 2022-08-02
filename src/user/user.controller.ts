@@ -38,7 +38,10 @@ export class UserController {
     ImportCsvAndValidateData,
   )
   studentRegister(@Req() req): Promise<StudentRegisterResponse> {
-    return this.userService.studentRegister(req.importStudents);
+    return this.userService.studentRegister(
+      req.importStudents,
+      req.incorrectData,
+    );
   }
 
   @Get('/student/activate/:userId/:registerToken')

@@ -39,8 +39,32 @@ export class ImportCsvAndValidateData implements NestInterceptor {
       throw e2;
     }
 
+    const parseArr = papaparseToArrOfObj(csvText);
+
     const validateImportedStudentList: ImportedStudentData[] =
-      validateImportedStudentData(papaparseToArrOfObj(csvText));
+      validateImportedStudentData(parseArr);
+
+    request.incorrectData = {
+      number: 0,
+      emails: [],
+    };
+
+    const incorrectData = parseArr
+      .filter(function (o1) {
+        return validateImportedStudentList.every(function (o2) {
+          return o1 !== o2;
+        });
+      })
+      .map((el) => {
+        request.incorrectData.number++;
+        return el.email;
+      });
+
+    // if (request.incorrectData.number > 0) {
+    request.incorrectData.emails = incorrectData;
+    // } else {
+    //   delete request.incorrectData;
+    // }
 
     request.importStudents = validateImportedStudentList;
     return next.handle();

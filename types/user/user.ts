@@ -26,4 +26,8 @@ export interface StudentRegisterResponse {
     number: number;
     emails: string[];
   };
+  incorrectStudentData: {
+    number: number;
+    emails: string[];
+  };
 }
