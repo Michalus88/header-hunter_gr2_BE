@@ -46,6 +46,10 @@ export interface StudentProfileRegister {
   courses: string | undefined;
 }
 
+export interface StudentProfileUpdate extends StudentProfileRegister {
+  email: string;
+}
+
 export interface AvailableStudentRes
   extends Omit<ImportedStudentData, 'email' | 'bonusProjectUrls'>,
     Pick<
