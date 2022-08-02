@@ -1,12 +1,14 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('api/student')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
   @Get('/available')
+  @UseGuards(JwtAuthGuard)
   getAllAvailable() {
     return this.studentService.getAllAvailable();
   }

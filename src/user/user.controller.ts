@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Req,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -14,17 +15,21 @@ import * as path from 'path';
 import { multerStorage, storageDir } from 'src/utils/storage';
 import { StudentRegisterResponse } from 'types';
 import { ImportCsvAndValidateData } from 'src/interceptors/import-csv-and-validate-data.interceptor';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { IsAdmin } from '../guards/is-admin';
 
 @Controller('api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('/hr')
+  @UseGuards(JwtAuthGuard, IsAdmin)
   hrRegister(@Body() hrRegisterDto: HrRegisterDto) {
     return this.userService.hrRegister(hrRegisterDto);
   }
 
   @Post('/student')
+  @UseGuards(JwtAuthGuard, IsAdmin)
   @UseInterceptors(
     FileFieldsInterceptor(
       [
