@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import { AvailableStudentRes, ImportedStudentData, StudentStatus } from 'types';
@@ -14,6 +15,7 @@ import { validateActivationCredentials } from '../utils/validate-activation-cred
 import { HrProfile } from '../hr/hr-profile.entity';
 import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
+import { uuid } from 'uuidv4';
 
 @Injectable()
 export class StudentService {
@@ -42,15 +44,22 @@ export class StudentService {
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
       .leftJoin('student.hrProfile', 'hrProfile')
-      .where('user.isActive = true AND student.hrProfileId = hrProfile.id')
+      .where('user.isActive = true')
       .getMany();
   }
 
   async isStudentBooked(studentId: string) {
-    const studentProfile = await StudentProfile.findOneBy({ id: studentId });
+    const studentProfile = await this.dataSource
+      .createQueryBuilder()
+      .select('student')
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .where('student.id = :studentId AND user.isActive = true ', { studentId })
+      .getOne();
+
     if (!studentProfile) {
       throw new BadRequestException(
-        `The user with the id: ${studentId} do not exists.`,
+        `The student with the id: ${studentId} do not exists.`,
       );
     }
     if (studentProfile.status === StudentStatus.HIRED) {
@@ -64,10 +73,34 @@ export class StudentService {
     return studentProfile;
   }
 
-  // async getBookedStudents(user: User) {}
+  async getReservedStudents(user: User) {
+    return this.dataSource
+      .createQueryBuilder()
+      .select([
+        'student.id',
+        'student.courseCompletion',
+        'student.courseEngagement',
+        'student.projectDegree',
+        'student.teamProjectDegree',
+        'sInfo.firstName',
+        'sInfo.lastName',
+        'sInfo.expectedTypeWork',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.canTakeApprenticeship',
+        'sInfo.monthsOfCommercialExp',
+      ])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .leftJoin('student.hrProfile', 'hrProfile')
+      .where('hrProfile.userId = :userId ', { userId: user.id })
+      .getMany();
+  }
 
   async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
     const studentProfile = new StudentProfile();
+    studentProfile.id = uuid();
     studentProfile.user = user;
     studentProfile.courseCompletion = student.courseCompletion;
     studentProfile.courseEngagement = student.courseEngagement;
@@ -114,47 +147,56 @@ export class StudentService {
       workExperience,
       monthsOfCommercialExp,
     } = studentProfileActivation;
+    try {
+      const studentInfo = new StudentInfo();
+      studentInfo.id = uuid();
+      studentInfo.tel = tel ?? null;
+      studentInfo.firstName = firstName;
+      studentInfo.lastName = lastName;
+      studentInfo.githubUsername = githubUsername;
+      studentInfo.bio = bio ?? null;
+      studentInfo.expectedTypeWork = expectedTypeWork;
+      studentInfo.targetWorkCity = targetWorkCity ?? null;
+      studentInfo.expectedContractType = expectedContractType;
+      studentInfo.expectedSalary = expectedSalary ?? null;
+      studentInfo.canTakeApprenticeship = canTakeApprenticeship ?? false;
+      studentInfo.monthsOfCommercialExp = monthsOfCommercialExp ?? 0;
+      studentInfo.education = education ?? null;
+      studentInfo.workExperience = workExperience ?? null;
+      studentInfo.courses = courses ?? null;
+      await studentInfo.save();
 
-    const studentInfo = new StudentInfo();
-    studentInfo.tel = tel ?? null;
-    studentInfo.firstName = firstName;
-    studentInfo.lastName = lastName;
-    studentInfo.githubUsername = githubUsername;
-    studentInfo.bio = bio ?? null;
-    studentInfo.expectedTypeWork = expectedTypeWork;
-    studentInfo.targetWorkCity = targetWorkCity ?? null;
-    studentInfo.expectedContractType = expectedContractType;
-    studentInfo.expectedSalary = expectedSalary ?? null;
-    studentInfo.canTakeApprenticeship = canTakeApprenticeship ?? false;
-    studentInfo.monthsOfCommercialExp = monthsOfCommercialExp ?? 0;
-    studentInfo.education = education ?? null;
-    studentInfo.workExperience = workExperience ?? null;
-    studentInfo.courses = courses ?? null;
-    await studentInfo.save();
+      studentProfile.studentInfo = studentInfo;
+      await studentProfile.save();
 
-    studentProfile.studentInfo = studentInfo;
-    await studentProfile.save();
-
-    const portfolioUrlsEntity = new StudentPortfolioUrl();
-    if (portfolioUrls) {
-      for (const url of portfolioUrls) {
-        portfolioUrlsEntity.url = url;
-        portfolioUrlsEntity.studentInfo = studentInfo;
-        await portfolioUrlsEntity.save();
+      const portfolioUrlsEntity = new StudentPortfolioUrl();
+      if (portfolioUrls) {
+        for (const url of portfolioUrls) {
+          portfolioUrlsEntity.url = url;
+          portfolioUrlsEntity.studentInfo = studentInfo;
+          await portfolioUrlsEntity.save();
+        }
       }
-    }
 
-    for (const url of projectUrls) {
-      const projectUrlsEntity = new StudentProjectUrl();
-      projectUrlsEntity.studentInfo = studentInfo;
-      projectUrlsEntity.url = url;
-      await projectUrlsEntity.save();
-    }
+      for (const url of projectUrls) {
+        const projectUrlsEntity = new StudentProjectUrl();
+        projectUrlsEntity.studentInfo = studentInfo;
+        projectUrlsEntity.url = url;
+        await projectUrlsEntity.save();
+      }
 
-    user.registerToken = null;
-    user.isActive = true;
-    await user.save();
-    return { statusCode: 201, message: 'Activation successful' };
+      user.registerToken = null;
+      user.isActive = true;
+      await user.save();
+      return { statusCode: 201, message: 'Activation successful' };
+    } catch (err) {
+      if (err.errno && err.errno === 1062) {
+        throw new BadRequestException(
+          'Sorry. Student with the given gitHub name is register.',
+        );
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   // async getAssignedStudents(hr: HrProfile) {}
