@@ -22,5 +22,8 @@ export type UserRes = Omit<
 export interface StudentRegisterResponse {
   numberOfStudentsToRegister: number;
   numberOfSuccessfullyRegistered: number;
-  numberOfEmailsAlreadyRegistered: number;
+  emailsAlreadyRegistered: {
+    number: number;
+    emails: string[];
+  };
 }

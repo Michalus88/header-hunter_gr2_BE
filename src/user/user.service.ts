@@ -55,18 +55,24 @@ export class UserService {
   async studentRegister(
     students: ImportedStudentData[],
   ): Promise<StudentRegisterResponse> {
-    let numberOfStudentsToRegister = 0;
-    let numberOfSuccessfullyRegistered = 0;
-    let numberOfEmailsAlreadyRegistered = 0;
+    const response = {
+      numberOfStudentsToRegister: 0,
+      numberOfSuccessfullyRegistered: 0,
+      emailsAlreadyRegistered: {
+        number: 0,
+        emails: [],
+      },
+    };
 
     for (const student of students) {
-      numberOfStudentsToRegister++;
+      response.numberOfStudentsToRegister++;
       const user = await this.getByEmail(student.email);
 
       if (user) {
-        numberOfEmailsAlreadyRegistered++;
+        response.emailsAlreadyRegistered.number++;
+        response.emailsAlreadyRegistered.emails.push(user.email);
       } else {
-        numberOfSuccessfullyRegistered++;
+        response.numberOfSuccessfullyRegistered++;
         const { user, password, registerToken } = await this.saveToUserEntity(
           student.email,
           Role.STUDENT,
@@ -83,11 +89,7 @@ export class UserService {
       }
     }
 
-    return {
-      numberOfStudentsToRegister,
-      numberOfSuccessfullyRegistered,
-      numberOfEmailsAlreadyRegistered,
-    };
+    return response;
   }
 
   async accountActivation(userId: string, registerToken: string) {
