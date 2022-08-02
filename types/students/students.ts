@@ -1,7 +1,7 @@
 export enum StudentStatus {
-  AVAILABLE = 'available',
-  RESERVED = 'reserved',
-  HIRED = 'hired',
+  AVAILABLE = 1,
+  RESERVED = 2,
+  HIRED = 3,
 }
 
 export interface ImportedStudentData {
