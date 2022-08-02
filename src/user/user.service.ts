@@ -7,7 +7,7 @@ import { User } from './user.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { MailService } from '../mail/mail.service';
 import { StudentService } from '../student/student.service';
-import { ImportedStudentData, Role } from 'types';
+import { ImportedStudentData, StudentRegisterResponse, Role } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 
 @Injectable()
@@ -52,7 +52,9 @@ export class UserService {
     };
   }
 
-  async studentRegister(students: ImportedStudentData[]): Promise<any> {
+  async studentRegister(
+    students: ImportedStudentData[],
+  ): Promise<StudentRegisterResponse> {
     let numberOfStudentsToRegister = 0;
     let numberOfSuccessfullyRegistered = 0;
     let numberOfEmailsAlreadyRegistered = 0;
