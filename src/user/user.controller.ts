@@ -4,16 +4,16 @@ import {
   Get,
   Param,
   Post,
-  UploadedFiles,
+  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import * as path from 'path';
-import { MulterDiskUploadedFiles } from 'src/interfaces';
 import { multerStorage, storageDir } from 'src/utils/storage';
 import { ImportedStudentData } from 'types';
+import { ImportCsvAndValidateData } from 'src/interceptors/import-csv-and-validate-data.interceptor';
 
 @Controller('api/user')
 export class UserController {
@@ -25,8 +25,20 @@ export class UserController {
   }
 
   @Post('/student')
-  studentRegister() {
-    return this.userService.studentRegister();
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        {
+          name: 'studentsList',
+          maxCount: 1,
+        },
+      ],
+      { storage: multerStorage(path.join(storageDir(), 'students-list')) },
+    ),
+    ImportCsvAndValidateData,
+  )
+  studentRegister(@Req() req): Promise<ImportedStudentData[]> {
+    return this.userService.studentRegister(req.importStudents);
   }
 
   @Get('/student/activate/:userId/:registerToken')
@@ -36,22 +48,4 @@ export class UserController {
   ) {
     return this.userService.accountActivation(userId, registerToken);
   }
-
-  // @Post('/student')
-  // @UseInterceptors(
-  //   FileFieldsInterceptor(
-  //     [
-  //       {
-  //         name: 'studentsList',
-  //         maxCount: 1,
-  //       },
-  //     ],
-  //     { storage: multerStorage(path.join(storageDir(), 'students-list')) },
-  //   ),
-  // )
-  // studentRegister(
-  //   @UploadedFiles() files: MulterDiskUploadedFiles,
-  // ): Promise<ImportedStudentData[]> {
-  //   return this.userService.studentRegister(files);
-  // }
 }

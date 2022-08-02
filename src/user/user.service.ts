@@ -52,62 +52,28 @@ export class UserService {
     };
   }
 
-  async studentRegister() {
-    const mokStudents: ImportedStudentData[] = [
-      {
-        email: 'michalus@gmail.com',
-        projectDegree: 4,
-        courseEngagement: 4,
-        teamProjectDegree: 5,
-        courseCompletion: 4.5,
-        bonusProjectUrls: [
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_BE',
-        ],
-      },
-      {
-        email: 'test2@gmail.com',
-        projectDegree: 3,
-        courseEngagement: 4,
-        teamProjectDegree: 5,
-        courseCompletion: 4,
-        bonusProjectUrls: [
-          'https://github.com/test_FE',
-          'https://github.com/test_BE',
-        ],
-      },
-      {
-        email: 'test3@gmail.com',
-        projectDegree: 5,
-        courseEngagement: 5,
-        teamProjectDegree: 5,
-        courseCompletion: 5,
-        bonusProjectUrls: [
-          'https://github.com/Michalus88/header-hunter_gr2_FE',
-          'https://github.com/Michalus88/header-hunter_gr2_BE',
-        ],
-      },
-    ];
-    const numberOfStudentsToRegister = mokStudents.length;
+  async studentRegister(students: ImportedStudentData[]): Promise<any> {
+    let numberOfStudentsToRegister = 0;
     let numberOfSuccessfullyRegistered = 0;
     let numberOfEmailsAlreadyRegistered = 0;
 
-    for (const mokStudent of mokStudents) {
-      const user = await this.getByEmail(mokStudent.email);
+    for (const student of students) {
+      numberOfStudentsToRegister++;
+      const user = await this.getByEmail(student.email);
 
       if (user) {
         numberOfEmailsAlreadyRegistered++;
       } else {
         numberOfSuccessfullyRegistered++;
         const { user, password, registerToken } = await this.saveToUserEntity(
-          mokStudent.email,
+          student.email,
           Role.STUDENT,
         );
-        await this.studentService.saveDataFromCsvToDb(mokStudent, user);
+        await this.studentService.saveDataFromCsvToDb(student, user);
 
         // Wyłączone wysyłanie emaili przy developmencie
         // await this.mailService.sendActivateLink(
-        //   mokStudent.email,
+        //   student.email,
         //   userId,
         //   registerToken,
         //   password,
@@ -120,28 +86,6 @@ export class UserService {
       numberOfSuccessfullyRegistered,
       numberOfEmailsAlreadyRegistered,
     };
-
-    //   files: MulterDiskUploadedFiles,
-    // ): Promise<ImportedStudentData[]> {
-    //   const csvFile = files?.studentsList?.[0] ?? null;
-    //   let csvText = '';
-    //   try {
-    //     if (csvFile) {
-    //       csvText = String(
-    //         fs.readFileSync(
-    //           path.join(storageDir(), 'students-list', csvFile.filename),
-    //         ),
-    //       );
-    //     }
-    //   } catch (e2) {
-    //     throw e2;
-    //   }
-    //
-    //   const validateImportedStudentList = validateImportedStudentData(
-    //     papaparseToArrOfObj(csvText),
-    //   );
-    //
-    //   return validateImportedStudentList;
   }
 
   async accountActivation(userId: string, registerToken: string) {
