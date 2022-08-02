@@ -12,7 +12,7 @@ import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import * as path from 'path';
 import { multerStorage, storageDir } from 'src/utils/storage';
-import { ImportedStudentData } from 'types';
+import { StudentRegisterResponse } from 'types';
 import { ImportCsvAndValidateData } from 'src/interceptors/import-csv-and-validate-data.interceptor';
 
 @Controller('api/user')
@@ -37,7 +37,7 @@ export class UserController {
     ),
     ImportCsvAndValidateData,
   )
-  studentRegister(@Req() req): Promise<ImportedStudentData[]> {
+  studentRegister(@Req() req): Promise<StudentRegisterResponse> {
     return this.userService.studentRegister(req.importStudents);
   }
 
