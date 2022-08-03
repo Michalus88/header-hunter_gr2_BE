@@ -5,17 +5,17 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { AvailableStudentRes, ImportedStudentData, StudentStatus } from 'types';
+import { ImportedStudentData, StudentStatus } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
 import { StudentProjectUrl } from './student-project-url.entity';
 import { User } from '../user/user.entity';
 import { validateActivationCredentials } from '../utils/validate-activation-credentials';
-import { HrProfile } from '../hr/hr-profile.entity';
 import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
+import { isReservationValid } from '../utils/is-reservation-valid';
 
 @Injectable()
 export class StudentService {
@@ -105,6 +105,7 @@ export class StudentService {
   }
 
   async getAllAvailable() {
+    await this.verificationStudentBookingTime();
     return this.dataSource
       .createQueryBuilder()
       .select([
@@ -127,11 +128,14 @@ export class StudentService {
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
       .leftJoin('student.hrProfile', 'hrProfile')
-      .where('user.isActive = true')
+      .where('user.isActive = true AND student.status = :available', {
+        available: StudentStatus.AVAILABLE,
+      })
       .getMany();
   }
 
   async getReservedStudents(user: User) {
+    await this.verificationStudentBookingTime();
     return this.dataSource
       .createQueryBuilder()
       .select([
@@ -207,11 +211,33 @@ export class StudentService {
     if (studentProfile.status === StudentStatus.HIRED) {
       throw new ForbiddenException('This student is already hired.');
     }
-    if (studentProfile.bookingDate) {
+    if (studentProfile.bookingDateTo) {
       throw new ForbiddenException(
         `The Student with the id: ${studentId} is already booked.`,
       );
     }
     return studentProfile;
+  }
+
+  async verificationStudentBookingTime() {
+    const reservedStudents = await this.dataSource
+      .createQueryBuilder()
+      .select(['student'])
+      .from(StudentProfile, 'student')
+      .where('student.status = :reserved ', {
+        reserved: StudentStatus.RESERVED,
+      })
+      .getMany();
+
+    for (const student of reservedStudents) {
+      console.log(student);
+      if (isReservationValid(student.bookingDateTo)) {
+        console.log(student);
+        student.status = StudentStatus.AVAILABLE;
+        student.bookingDateTo = null;
+        student.hrProfile = null;
+        await student.save();
+      }
+    }
   }
 }
