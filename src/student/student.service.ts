@@ -240,4 +240,16 @@ export class StudentService {
       }
     }
   }
+
+  async studentProfileUpdate(studentProfile, userId, errors) {
+    let isErrors = false;
+    for (const error in errors) {
+      if (errors[error] === true) {
+        isErrors = true;
+        break;
+      }
+    }
+    console.log(errors);
+    if (isErrors) throw new BadRequestException({ errors });
+  }
 }

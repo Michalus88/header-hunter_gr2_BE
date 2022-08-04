@@ -56,8 +56,4 @@ export class UserController {
   ) {
     return this.userService.accountActivation(userId, registerToken);
   }
-  @Get('/isCorrectGitHubStudentAccount/:gitHubUser')
-  isCorrectGitHubStudentAccount(@Param('gitHubUser') gitHubUser: string) {
-    return this.userService.isCorrectGitHubStudentAccount(gitHubUser);
-  }
 }
