@@ -15,10 +15,12 @@ export class MailService {
       to: email,
       subject: 'Header Hunter account activation',
       from: 'headerhuntergr2@gmail.com',
-      html: `<ul>
-              <li><span>Activation link: </span> <a  href="http://localhost:3000/activate/${userId}/${registerToken}">Click here<\a></li>
-              <li><span>First login password: </span><strong>${password}</strong> </li>
-             </ul>`,
+      template: 'activation-link',
+      context: {
+        userId,
+        registerToken,
+        password,
+      },
     };
     await this.mailerService.sendMail(mail);
 

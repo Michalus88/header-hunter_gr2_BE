@@ -1,31 +1,42 @@
+import { BadRequestException } from '@nestjs/common';
 import * as Papa from 'papaparse';
 import { ImportedStudentData } from 'types';
 
 export function validateImportedStudentData(
   arr: ImportedStudentData[],
 ): ImportedStudentData[] {
-  return arr.filter((el) => {
-    return (
-      el.email.includes('@') &&
-      !isNaN(el.courseCompletion) &&
-      !isNaN(el.courseEngagement) &&
-      !isNaN(el.projectDegree) &&
-      !isNaN(el.teamProjectDegree) &&
-      el.courseCompletion >= 0 &&
-      el.courseCompletion <= 5 &&
-      el.courseEngagement >= 0 &&
-      el.courseEngagement <= 5 &&
-      el.projectDegree >= 0 &&
-      el.projectDegree <= 5 &&
-      el.teamProjectDegree >= 0 &&
-      el.teamProjectDegree <= 5 &&
-      el.bonusProjectUrls.every((el2) => String(el2).includes('github.com'))
-    );
-  });
+  if (!Array.isArray(arr) || arr.length == 0) return [];
+
+  try {
+    return arr.filter((el) => {
+      return (
+        el.email.includes('@') &&
+        !isNaN(el.courseCompletion) &&
+        !isNaN(el.courseEngagement) &&
+        !isNaN(el.projectDegree) &&
+        !isNaN(el.teamProjectDegree) &&
+        el.courseCompletion >= 0 &&
+        el.courseCompletion <= 5 &&
+        el.courseEngagement >= 0 &&
+        el.courseEngagement <= 5 &&
+        el.projectDegree >= 0 &&
+        el.projectDegree <= 5 &&
+        el.teamProjectDegree >= 0 &&
+        el.teamProjectDegree <= 5 &&
+        el.bonusProjectUrls.every((el2) => String(el2).includes('github.com'))
+      );
+    });
+  } catch {
+    throw new BadRequestException('Invalid file format.');
+  }
 }
 
 export function papaparseToArrOfObj(csvText: string): ImportedStudentData[] {
   const csvObj = Papa.parse(csvText);
+
+  if (csvObj.errors.length > 0) {
+    throw new BadRequestException('Invalid file format.');
+  }
 
   const csvArrObj = [];
 
