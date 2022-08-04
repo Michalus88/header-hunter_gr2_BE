@@ -48,7 +48,7 @@ export class StudentProfile extends BaseEntity {
 
   @OneToMany(() => BonusProjectUrl, (entity) => entity.studentProfile)
   bonusProjectUrls: BonusProjectUrl[];
-
+  
   @Column({ type: 'datetime', nullable: true })
   bookingDateTo: Date;
 
