@@ -49,8 +49,8 @@ export class StudentProfile extends BaseEntity {
   @OneToMany(() => BonusProjectUrl, (entity) => entity.studentProfile)
   bonusProjectUrls: BonusProjectUrl[];
 
-  @Column({ type: 'timestamp', nullable: true })
-  bookingDate: Date;
+  @Column({ type: 'datetime', nullable: true })
+  bookingDateTo: Date;
 
   @ManyToOne((type) => HrProfile, (entity) => entity.reservedStudents)
   hrProfile: HrProfile;

@@ -23,7 +23,7 @@ export class HrService {
 
     studentProfile.hrProfile = hrProfile;
     studentProfile.status = StudentStatus.RESERVED;
-    studentProfile.bookingDate = new Date();
+    studentProfile.bookingDateTo = new Date();
     await studentProfile.save();
     return {
       codeStatus: 200,
