@@ -1,6 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { hashPwd } from '../utils/hash-pwd';
 import { uuid } from 'uuidv4';
+import fetch from 'node-fetch';
 import { sanitizeUser } from '../utils/sanitize-user';
 import { validateActivationCredentials } from '../utils/validate-activation-credentials';
 import { User } from './user.entity';
@@ -139,5 +144,21 @@ export class UserService {
 
     await user.save();
     return { password, user, registerToken };
+  }
+
+  async isCorrectGitHubStudentAccount(
+    userGitHubAccount: string,
+  ): Promise<boolean> {
+    if (typeof userGitHubAccount != 'string') return false;
+
+    try {
+      const res = await fetch(
+        `https://api.github.com/users/${userGitHubAccount}`,
+      );
+      const json = await res.json();
+      return json?.login ? true : false;
+    } catch {
+      throw new NotFoundException('Connection GitHub error.');
+    }
   }
 }
