@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { FilteringOptions } from '../../types';
 
 @Controller('api/student')
 export class StudentController {
@@ -9,6 +11,12 @@ export class StudentController {
   @Get('/available')
   getAllAvailable() {
     return this.studentService.getAllAvailable();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/available/filtered')
+  getFilteredStudent(@Body() filteringOptions: FilteringOptions) {
+    return this.studentService.getFilteredStudents(filteringOptions);
   }
 
   @Post('/activate/:userId/:registerToken')

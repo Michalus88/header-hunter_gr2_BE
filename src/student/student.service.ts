@@ -16,6 +16,7 @@ import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
 import { isReservationValid } from '../utils/is-reservation-valid';
+import { FilteringOptionsDto } from './dto/filtering-options.dto';
 
 @Injectable()
 export class StudentService {
@@ -158,6 +159,24 @@ export class StudentService {
       .leftJoin('student.hrProfile', 'hrProfile')
       .where('hrProfile.userId = :userId ', { userId: user.id })
       .getMany();
+  }
+
+  async getFilteredStudents(filteringOptions: FilteringOptionsDto) {
+    const {
+      expectedSalaryTo,
+      expectedSalaryFrom,
+      expectedContractType,
+      teamProjectDegree,
+      canTakeApprenticeship,
+      courseEngagement,
+      courseCompletion,
+      monthsOfCommercialExp,
+      projectDegree,
+    } = filteringOptions;
+
+    const add = (option: string | number | null, column: string) => {
+      // if()
+    };
   }
 
   async getDetailedStudent(user: User, studentId: string) {
