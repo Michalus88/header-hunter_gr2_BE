@@ -4,14 +4,19 @@ import fetch from 'node-fetch';
 export const isCorrectGitHubUserAccount = async (
   userGitHubAccount: string,
 ): Promise<boolean> => {
-  if (typeof userGitHubAccount != 'string') return false;
+  //   if (typeof userGitHubAccount != 'string') return false;
 
   try {
     const res = await fetch(
       `https://api.github.com/users/${userGitHubAccount}`,
     );
     const json = await res.json();
-    return json?.login ? true : false;
+
+    if (typeof json.login === 'undefined') {
+      return false;
+    } else {
+      return true;
+    }
   } catch {
     throw new NotFoundException('Connection GitHub error.');
   }

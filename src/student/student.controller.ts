@@ -14,16 +14,18 @@ import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { IsHr } from '../guards/is-hr';
 import { StudentProfileUpdate } from 'types';
-import { UserDetailDataValidate } from 'src/interceptors/user-detail-data-validate.interceptor';
+import { StudentDetailDataValidate } from 'src/interceptors/student-detail-data-validate.interceptor';
+import { StudentProfile } from './student-profile.entity';
 
 @Controller('api/student')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
   @Patch('/:userId')
-  @UseInterceptors(UserDetailDataValidate)
+  // @UseGuards(JwtAuthGuard)
+  @UseInterceptors(StudentDetailDataValidate)
   studentProfileUpdate(
-    @Body() studentProfile: StudentProfileUpdate,
+    @Body() studentProfile: StudentProfile,
     @Param('userId') userId: string,
     @Req() req,
   ) {

@@ -9,9 +9,10 @@ import { StudentProfileRegister } from 'types';
 import { Reflector } from '@nestjs/core';
 import { isCorrectGitHubUserAccount } from 'src/utils/is-correct-github-user';
 import { isBoolean } from 'class-validator';
+import { tap } from 'rxjs';
 
 @Injectable()
-export class UserDetailDataValidate implements NestInterceptor {
+export class StudentDetailDataValidate implements NestInterceptor {
   constructor(private reflector: Reflector) {}
   async intercept(
     context: ExecutionContext,
@@ -38,6 +39,7 @@ export class UserDetailDataValidate implements NestInterceptor {
     };
     const [req] = context.getArgs();
     const request = context.switchToHttp().getRequest();
+
     const {
       email,
       tel,
@@ -65,11 +67,11 @@ export class UserDetailDataValidate implements NestInterceptor {
       errors.firstName = true;
     if (lastName == undefined || String(lastName).length == 0)
       errors.lastName = true;
-    if (
-      String(githubUsername).length == 0 ||
-      isCorrectGitHubUserAccount(githubUsername)
-    )
+
+    if (!(await isCorrectGitHubUserAccount(githubUsername)))
       errors.githubUsername = true;
+    request.errors = errors;
+
     if (
       projectUrls == undefined ||
       Array(projectUrls).every((el) => !String(el).includes('github.com')) ||
