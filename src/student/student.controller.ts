@@ -10,7 +10,6 @@ export class StudentController {
 
   @Get('/available')
   @UseGuards(JwtAuthGuard, IsHr)
-  @UseGuards(JwtAuthGuard)
   getAllAvailable() {
     return this.studentService.getAllAvailable();
   }
