@@ -4,6 +4,7 @@ import { HrProfile } from './hr-profile.entity';
 import { StudentStatus } from '../../types';
 import { DataSource } from 'typeorm';
 import { StudentService } from '../student/student.service';
+import { setMaxReservationTime } from '../utils/set-max-reservation-time';
 
 @Injectable()
 export class HrService {
@@ -23,7 +24,7 @@ export class HrService {
 
     studentProfile.hrProfile = hrProfile;
     studentProfile.status = StudentStatus.RESERVED;
-    studentProfile.bookingDateTo = new Date();
+    studentProfile.bookingDateTo = setMaxReservationTime(10);
     await studentProfile.save();
     return {
       codeStatus: 200,
