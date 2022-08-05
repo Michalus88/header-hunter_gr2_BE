@@ -16,6 +16,8 @@ import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
 import { isReservationValid } from '../utils/is-reservation-valid';
+import { FilteringOptionsDto } from './dto/filtering-options.dto';
+import { filteringQueryBuilder } from '../utils/filtering-query-builder';
 
 @Injectable()
 export class StudentService {
@@ -104,8 +106,18 @@ export class StudentService {
     }
   }
 
-  async getAllAvailable() {
+  async getAllAvailable(
+    filterQuery?: string,
+    filterParameters?: Omit<
+      FilteringOptionsDto,
+      'expectedSalaryFrom' | 'expectedSalaryTo'
+    >,
+  ) {
+    const parameters = filterParameters
+      ? { ...filterParameters, available: StudentStatus.AVAILABLE }
+      : { available: StudentStatus.AVAILABLE };
     await this.verificationStudentBookingTime();
+
     return this.dataSource
       .createQueryBuilder()
       .select([
@@ -127,10 +139,11 @@ export class StudentService {
       .from(StudentProfile, 'student')
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('user.isActive = true AND student.status = :available', {
-        available: StudentStatus.AVAILABLE,
-      })
+      .where(
+        `user.isActive = true AND student.status = :available 
+        ${filterQuery ?? ''}`,
+        parameters,
+      )
       .getMany();
   }
 
@@ -158,6 +171,30 @@ export class StudentService {
       .leftJoin('student.hrProfile', 'hrProfile')
       .where('hrProfile.userId = :userId ', { userId: user.id })
       .getMany();
+  }
+
+  async getFilteredStudents(filteringOptions: FilteringOptionsDto) {
+    const {
+      expectedContractType,
+      teamProjectDegree,
+      canTakeApprenticeship,
+      courseEngagement,
+      courseCompletion,
+      monthsOfCommercialExp,
+      projectDegree,
+    } = filteringOptions;
+    const parameters = {
+      expectedContractType,
+      teamProjectDegree,
+      canTakeApprenticeship,
+      courseEngagement,
+      courseCompletion,
+      monthsOfCommercialExp,
+      projectDegree,
+    };
+    const filterQuery = filteringQueryBuilder(filteringOptions);
+
+    return this.getAllAvailable(filterQuery, parameters);
   }
 
   async getDetailedStudent(user: User, studentId: string) {
@@ -228,11 +265,9 @@ export class StudentService {
         reserved: StudentStatus.RESERVED,
       })
       .getMany();
-
+    if (reservedStudents.length === 0) return;
     for (const student of reservedStudents) {
-      console.log(student);
       if (isReservationValid(student.bookingDateTo)) {
-        console.log(student);
         student.status = StudentStatus.AVAILABLE;
         student.bookingDateTo = null;
         student.hrProfile = null;

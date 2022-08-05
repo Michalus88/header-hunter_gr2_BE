@@ -82,3 +82,15 @@ export interface StudentDataRes
   id: string;
   status: StudentStatus;
 }
+
+export interface FilteringOptions {
+  courseCompletion: number | null;
+  courseEngagement: number | null;
+  projectDegree: number | null;
+  teamProjectDegree: number | null;
+  expectedContractType: ExpectedContractType | null;
+  expectedSalaryFrom: number | null;
+  expectedSalaryTo: number | null;
+  canTakeApprenticeship: boolean | null;
+  monthsOfCommercialExp: number | null;
+}
