@@ -13,9 +13,9 @@ import { StudentService } from './student.service';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { IsHr } from '../guards/is-hr';
-import { StudentProfileUpdate } from 'types';
-import { StudentDetailDataValidate } from 'src/interceptors/student-detail-data-validate.interceptor';
-import { StudentProfile } from './student-profile.entity';
+import { StudentProfileUpdateDto } from './dto/profile-update.dto';
+import { GithubUserValidate } from 'src/interceptors/gihub-user-validate.interceptor';
+import { EmailExistInDBValidate } from 'src/interceptors/email-exist-in-DB-validate.interceptor';
 
 @Controller('api/student')
 export class StudentController {
@@ -23,17 +23,13 @@ export class StudentController {
 
   @Patch('/:userId')
   // @UseGuards(JwtAuthGuard)
-  @UseInterceptors(StudentDetailDataValidate)
+  @UseInterceptors(EmailExistInDBValidate, GithubUserValidate)
   studentProfileUpdate(
-    @Body() studentProfile: StudentProfile,
+    @Body() studentProfile: StudentProfileUpdateDto,
     @Param('userId') userId: string,
     @Req() req,
   ) {
-    return this.studentService.studentProfileUpdate(
-      studentProfile,
-      userId,
-      req.errors,
-    );
+    return this.studentService.studentProfileUpdate(studentProfile, userId);
   }
 
   @Get('/available')

@@ -16,6 +16,7 @@ import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
 import { isReservationValid } from '../utils/is-reservation-valid';
+import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 
 @Injectable()
 export class StudentService {
@@ -106,32 +107,34 @@ export class StudentService {
 
   async getAllAvailable() {
     await this.verificationStudentBookingTime();
-    return this.dataSource
-      .createQueryBuilder()
-      .select([
-        'student.id',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'sInfo.firstName',
-        'sInfo.lastName',
-        'sInfo.expectedTypeWork',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
-        'sInfo.canTakeApprenticeship',
-        'sInfo.monthsOfCommercialExp',
-      ])
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('user.isActive = true AND student.status = :available', {
-        available: StudentStatus.AVAILABLE,
-      })
-      .getMany();
+    return (
+      this.dataSource
+        .createQueryBuilder()
+        .select([
+          'student.id',
+          'student.courseCompletion',
+          'student.courseEngagement',
+          'student.projectDegree',
+          'student.teamProjectDegree',
+          'sInfo.firstName',
+          'sInfo.lastName',
+          'sInfo.expectedTypeWork',
+          'sInfo.targetWorkCity',
+          'sInfo.expectedSalary',
+          'sInfo.targetWorkCity',
+          'sInfo.expectedSalary',
+          'sInfo.canTakeApprenticeship',
+          'sInfo.monthsOfCommercialExp',
+        ])
+        .from(StudentProfile, 'student')
+        .leftJoin('student.user', 'user')
+        .leftJoin('student.studentInfo', 'sInfo')
+        // .leftJoin('student.hrProfile', 'hrProfile')
+        .where('user.isActive = true AND student.status = :available', {
+          available: StudentStatus.AVAILABLE,
+        })
+        .getMany()
+    );
   }
 
   async getReservedStudents(user: User) {
@@ -241,15 +244,24 @@ export class StudentService {
     }
   }
 
-  async studentProfileUpdate(studentProfile: StudentProfile, userId, errors) {
-    let isErrors = false;
-    for (const error in errors) {
-      if (errors[error] === true) {
-        isErrors = true;
-        break;
-      }
-    }
-
-    if (isErrors) throw new BadRequestException({ errors });
+  async studentProfileUpdate(
+    studentProfile: StudentProfileUpdateDto,
+    studentId,
+  ) {
+    // return await this.dataSource
+    //   .createQueryBuilder()
+    //   // .select(['student', 'sPortfolioUrl'])
+    //   .select(['student', 'sInfo', 'projectUrl'])
+    //   .from(StudentProfile, 'student')
+    //   .addFrom(StudentPortfolioUrl, 'portfolioUrl')
+    //   .addFrom(StudentProjectUrl, 'projectUrl')
+    //   .leftJoin('student.studentInfo', 'sInfo')
+    //   // .leftJoin('portfolioUrl.studentInfo', 'sPortfolioUrl')
+    //   // .leftJoin('student.bonusProjectUrls', 'bProjectUrls')
+    //   .leftJoin('studentProjectUrl.studentInfo', 'projectUrl')
+    //   .where('student.userID = :studentId', {
+    //     studentId,
+    //   })
+    //   .getMany();
   }
 }
