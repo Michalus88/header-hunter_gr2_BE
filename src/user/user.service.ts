@@ -60,7 +60,7 @@ export class UserService {
     },
   ): Promise<StudentRegisterResponse> {
     const response = {
-      numberOfStudentsToRegister: 0,
+      numberOfStudentsToRegister: incorrectStudentData.number,
       numberOfSuccessfullyRegistered: 0,
       emailsAlreadyRegistered: {
         number: 0,

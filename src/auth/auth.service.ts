@@ -5,6 +5,7 @@ import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { hashPwd } from 'src/utils/hash-pwd';
 import { sanitizeUser } from '../utils/sanitize-user';
+import { stringToBoolean } from '../utils/string-to-boolean';
 // import { sanitizeUser } from 'src/utils/sanitize-user';
 
 @Injectable()
@@ -27,8 +28,8 @@ export class AuthService {
     return res
       .cookie('jwt', token, {
         secure: false,
-        // domain: 'localhost',
-        httpOnly: true,
+        domain: process.env.DOMAIN,
+        httpOnly: stringToBoolean(process.env.COOKIE_SECURE),
         maxAge: oneDay,
       })
       .json(sanitizeUser(user));
@@ -38,8 +39,8 @@ export class AuthService {
     res
       .clearCookie('jwt', {
         secure: false,
-        // domain: 'localhost',
-        httpOnly: true,
+        domain: process.env.DOMAIN,
+        httpOnly: stringToBoolean(process.env.COOKIE_SECURE),
       })
       .json({ message: 'Logout was successful' });
   }

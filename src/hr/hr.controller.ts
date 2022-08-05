@@ -6,6 +6,7 @@ import { User } from '../user/user.entity';
 import { StudentService } from '../student/student.service';
 import { HrRegisterDto } from './dto/hrRegister.dto';
 import { FilteringOptions } from '../../types';
+import { IsHr } from '../guards/is-hr';
 
 @Controller('api/hr')
 export class HrController {
@@ -14,14 +15,14 @@ export class HrController {
     private readonly studentService: StudentService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('/reserved-students')
+  @UseGuards(JwtAuthGuard, IsHr)
   getReservedStudents(@UserObj() user: User) {
     return this.studentService.getReservedStudents(user);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('/reserved-students/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
   getDetailedStudents(
     @UserObj() user: User,
     @Param('studentId') studentId: string,
@@ -29,8 +30,8 @@ export class HrController {
     return this.studentService.getDetailedStudent(user, studentId);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('/booking-student/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
   getAvailable(@UserObj() user: User, @Param('studentId') studentId: string) {
     return this.hrService.bookingStudent(user, studentId);
   }
