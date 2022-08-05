@@ -14,7 +14,7 @@ export class StudentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/available/filtered')
+  @Get('/filtered')
   getFilteredStudent(@Body() filteringOptions: FilteringOptions) {
     return this.studentService.getFilteredStudents(filteringOptions);
   }
