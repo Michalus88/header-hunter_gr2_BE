@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import { User } from 'src/user/user.entity';
@@ -6,7 +6,6 @@ import { UserService } from 'src/user/user.service';
 import { hashPwd } from 'src/utils/hash-pwd';
 import { sanitizeUser } from '../utils/sanitize-user';
 import { stringToBoolean } from '../utils/string-to-boolean';
-// import { sanitizeUser } from 'src/utils/sanitize-user';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +15,6 @@ export class AuthService {
     const user = await this.usersService.getByEmail(email);
     if (user && user.password === hashPwd(password, user.salt)) {
       return user;
-      // return sanitizeUser(user);
     }
     return null;
   }
@@ -25,6 +23,11 @@ export class AuthService {
     const payload = { email: user.email };
     const token = sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
     const oneDay = 1000 * 60 * 60 * 24;
+    if (!user.isActive) {
+      throw new BadRequestException(
+        'Your account is inactive. Please check Your mail and click to activation link.',
+      );
+    }
     return res
       .cookie('jwt', token, {
         secure: false,
