@@ -27,16 +27,15 @@ export class GithubUserValidate implements NestInterceptor {
         );
         const json = await res.json();
 
-        if (json.resources.core.remaining == 0) throw new Error();
+        if (json.resources.core.remaining == 0)
+          throw new BadRequestException(
+            `GitHub user validation error. GitHub remaining limit request is 0. Try later.`,
+          );
       } catch {
         throw new BadRequestException(
-          `GitHub user validation error. GitHub remaining limit request is 0. Try later.`,
+          'GitHub user validation error. GitHub user not exist or not connection to GitHub website.',
         );
       }
-    } else {
-      throw new BadRequestException(
-        'GitHub user validation error. GitHub user not exist or not connection to GitHub website.',
-      );
     }
 
     return next.handle();
