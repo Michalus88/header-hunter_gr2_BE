@@ -39,10 +39,14 @@ export class StudentInfo
   @Column({ unique: true })
   githubUsername: string;
 
-  @OneToMany(() => StudentPortfolioUrl, (entity) => entity.studentInfo)
+  @OneToMany(() => StudentPortfolioUrl, (entity) => entity.studentInfo, {
+    eager: true,
+  })
   portfolioUrls: StudentPortfolioUrl[];
 
-  @OneToMany(() => StudentProjectUrl, (entity) => entity.studentInfo)
+  @OneToMany(() => StudentProjectUrl, (entity) => entity.studentInfo, {
+    eager: true,
+  })
   projectUrls: StudentProjectUrl[];
 
   @Column({ nullable: true, length: 1000, default: null })
