@@ -5,7 +5,11 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { ImportedStudentData, StudentStatus } from 'types';
+import {
+  ImportedStudentData,
+  StudentProfileUpdate,
+  StudentStatus,
+} from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
@@ -164,7 +168,6 @@ export class StudentService {
   }
 
   async getDetailedStudent(user: User, studentId: string) {
-    console.log(studentId);
     return this.dataSource
       .createQueryBuilder()
       .select(['student', 'sInfo', 'user.email'])
@@ -235,7 +238,6 @@ export class StudentService {
     for (const student of reservedStudents) {
       console.log(student);
       if (isReservationValid(student.bookingDateTo)) {
-        console.log(student);
         student.status = StudentStatus.AVAILABLE;
         student.bookingDateTo = null;
         student.hrProfile = null;
@@ -245,23 +247,92 @@ export class StudentService {
   }
 
   async studentProfileUpdate(
-    studentProfile: StudentProfileUpdateDto,
-    studentId,
+    user: User,
+    studentProfileUpdateDto: StudentProfileUpdateDto,
+    studentId: string,
   ) {
-    // return await this.dataSource
-    //   .createQueryBuilder()
-    //   // .select(['student', 'sPortfolioUrl'])
-    //   .select(['student', 'sInfo', 'projectUrl'])
-    //   .from(StudentProfile, 'student')
-    //   .addFrom(StudentPortfolioUrl, 'portfolioUrl')
-    //   .addFrom(StudentProjectUrl, 'projectUrl')
-    //   .leftJoin('student.studentInfo', 'sInfo')
-    //   // .leftJoin('portfolioUrl.studentInfo', 'sPortfolioUrl')
-    //   // .leftJoin('student.bonusProjectUrls', 'bProjectUrls')
-    //   .leftJoin('studentProjectUrl.studentInfo', 'projectUrl')
-    //   .where('student.userID = :studentId', {
-    //     studentId,
-    //   })
-    //   .getMany();
+    const { studentInfo: sInfo } = await this.dataSource
+      .createQueryBuilder()
+      .select(['student.id', 'sInfo.id'])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .where('student.id = :studentId', {
+        studentId,
+      })
+      .getOne();
+    const studentInfo = await StudentInfo.findOneBy({ id: sInfo.id });
+    const {
+      email,
+      firstName,
+      lastName,
+      tel,
+      githubUsername,
+      bio,
+      expectedSalary,
+      expectedTypeWork,
+      targetWorkCity,
+      expectedContractType,
+      courses,
+      canTakeApprenticeship,
+      workExperience,
+      monthsOfCommercialExp,
+      education,
+      projectUrls,
+      portfolioUrls,
+    } = studentProfileUpdateDto;
+
+    user.email = email ?? user.email;
+    studentInfo.firstName = firstName ?? studentInfo.firstName;
+    studentInfo.lastName = lastName ?? studentInfo.lastName;
+    studentInfo.tel = tel ?? studentInfo.tel;
+    studentInfo.githubUsername = githubUsername ?? studentInfo.githubUsername;
+    studentInfo.bio = bio ?? studentInfo.bio;
+    studentInfo.expectedSalary = expectedSalary ?? studentInfo.expectedSalary;
+    studentInfo.expectedTypeWork =
+      expectedTypeWork ?? studentInfo.expectedTypeWork;
+    studentInfo.targetWorkCity = targetWorkCity ?? studentInfo.targetWorkCity;
+    studentInfo.expectedContractType =
+      expectedContractType ?? studentInfo.expectedContractType;
+    studentInfo.courses = courses ?? studentInfo.courses;
+    studentInfo.canTakeApprenticeship =
+      canTakeApprenticeship ?? studentInfo.canTakeApprenticeship;
+    studentInfo.workExperience = workExperience ?? studentInfo.workExperience;
+    studentInfo.monthsOfCommercialExp =
+      monthsOfCommercialExp ?? studentInfo.monthsOfCommercialExp;
+    studentInfo.education = education ?? studentInfo.education;
+    await user.save();
+    await studentInfo.save();
+
+    if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
+      await this.removeUrls(studentInfo.portfolioUrls);
+      await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
+    } else {
+      if (portfolioUrls?.length) {
+        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
+      }
+    }
+    if (projectUrls.length > 0) {
+      await this.removeUrls(studentInfo.projectUrls);
+      await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
+    }
+  }
+
+  async addUrls(
+    newEntity: typeof StudentPortfolioUrl | typeof StudentProjectUrl,
+    urls: string[],
+    studentInfo,
+  ) {
+    for (const url of urls) {
+      const entityUrl = new newEntity();
+      entityUrl.url = url;
+      entityUrl.studentInfo = studentInfo;
+      await entityUrl.save();
+    }
+  }
+
+  async removeUrls(entityUrls: StudentPortfolioUrl[] | StudentProjectUrl[]) {
+    for (const entity of entityUrls) {
+      await entity.remove();
+    }
   }
 }

@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Req,
   UseGuards,
   UseInterceptors,
@@ -16,20 +17,27 @@ import { IsHr } from '../guards/is-hr';
 import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { GithubUserValidate } from 'src/interceptors/gihub-user-validate.interceptor';
 import { EmailExistInDBValidate } from 'src/interceptors/email-exist-in-DB-validate.interceptor';
+import { UserObj } from '../decorators/user-object.decorator';
+import { User } from '../user/user.entity';
+import { IsStudent } from '../guards/is-student';
 
 @Controller('api/student')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  @Patch('/:userId')
-  // @UseGuards(JwtAuthGuard)
-  @UseInterceptors(EmailExistInDBValidate, GithubUserValidate)
+  @Put('/:studentId')
+  @UseGuards(JwtAuthGuard, IsStudent)
+  @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
   studentProfileUpdate(
-    @Body() studentProfile: StudentProfileUpdateDto,
-    @Param('userId') userId: string,
-    @Req() req,
+    @UserObj() user: User,
+    @Body() studentProfileUpdateDto,
+    @Param('userId') studentId: string,
   ) {
-    return this.studentService.studentProfileUpdate(studentProfile, userId);
+    return this.studentService.studentProfileUpdate(
+      user,
+      studentProfileUpdateDto,
+      studentId,
+    );
   }
 
   @Get('/available')
