@@ -22,9 +22,7 @@ export class GithubUserValidate implements NestInterceptor {
 
     if (!(await isCorrectGitHubUserAccount(githubUsername))) {
       try {
-        const res = await fetch(
-          `https://api.github.com/users/${githubUsername}`,
-        );
+        const res = await fetch(`https://api.github.com/rate_limit/`);
         const json = await res.json();
 
         if (json.resources.core.remaining == 0)
