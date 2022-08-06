@@ -19,19 +19,16 @@ export class EmailExistInDBValidate implements NestInterceptor {
   ): Promise<Observable<any>> {
     const [req] = context.getArgs();
 
-    const { userId } = req.params;
+    const userId = context.switchToHttp().getRequest().user.id;
     const { email } = req.body;
-
     const userEmail = await User.createQueryBuilder()
-      .select('user')
-      .from(User, 'user')
-      .where('user.email = :email AND NOT user.id = :userId', {
+      .select('u.email')
+      .from(User, 'u')
+      .where('u.email = :email AND NOT u.id = :userId', {
         email,
         userId,
       })
       .getOne();
-    // console.log(userEmail);
-
     if (userEmail) throw new BadRequestException('Email exist.');
     return next.handle();
   }
