@@ -236,7 +236,6 @@ export class StudentService {
       .getMany();
 
     for (const student of reservedStudents) {
-      console.log(student);
       if (isReservationValid(student.bookingDateTo)) {
         student.status = StudentStatus.AVAILABLE;
         student.bookingDateTo = null;
@@ -306,10 +305,8 @@ export class StudentService {
     if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
       await this.removeUrls(studentInfo.portfolioUrls);
       await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-    } else {
-      if (portfolioUrls?.length) {
-        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-      }
+    } else if (portfolioUrls?.length) {
+      await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
     }
     if (projectUrls.length > 0) {
       await this.removeUrls(studentInfo.projectUrls);
