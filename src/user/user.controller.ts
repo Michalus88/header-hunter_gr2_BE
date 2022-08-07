@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   UseGuards,
   UseInterceptors,
@@ -17,6 +18,9 @@ import { StudentRegisterResponse } from 'types';
 import { ImportCsvAndValidateData } from 'src/interceptors/import-csv-and-validate-data.interceptor';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { IsAdmin } from '../guards/is-admin';
+import { PasswordChangeDto } from './dto/password-change.dto';
+import { UserObj } from '../decorators/user-object.decorator';
+import { User } from './user.entity';
 
 @Controller('api/user')
 export class UserController {
@@ -55,5 +59,14 @@ export class UserController {
     @Param('registerToken') registerToken: string,
   ) {
     return this.userService.accountActivation(userId, registerToken);
+  }
+
+  @Put('/password')
+  @UseGuards(JwtAuthGuard)
+  passwordChange(
+    @Body() passwordChangedDto: PasswordChangeDto,
+    @UserObj() user: User,
+  ) {
+    return this.userService.passwordChange(passwordChangedDto, user);
   }
 }
