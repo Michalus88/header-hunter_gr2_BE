@@ -24,9 +24,6 @@ export class HrProfile
   @JoinColumn()
   user: User;
 
-  @Column({ unique: true })
-  email: string;
-
   @Column({ length: 80 })
   firstName: string;
 
