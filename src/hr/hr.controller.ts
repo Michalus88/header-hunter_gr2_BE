@@ -1,9 +1,11 @@
-import { Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { HrService } from './hr.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UserObj } from '../decorators/user-object.decorator';
 import { User } from '../user/user.entity';
 import { StudentService } from '../student/student.service';
+import { HrRegisterDto } from './dto/hrRegister.dto';
+import { FilteringOptions } from '../../types';
 import { IsHr } from '../guards/is-hr';
 
 @Controller('api/hr')

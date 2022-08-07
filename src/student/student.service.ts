@@ -21,6 +21,9 @@ import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
 import { isReservationValid } from '../utils/is-reservation-valid';
 import { StudentProfileUpdateDto } from './dto/profile-update.dto';
+import { FilteringOptionsDto } from './dto/filtering-options.dto';
+import { filteringQueryBuilder } from '../utils/filtering-query-builder';
+
 
 @Injectable()
 export class StudentService {
@@ -109,36 +112,45 @@ export class StudentService {
     }
   }
 
-  async getAllAvailable() {
+  async getAllAvailable(
+    filterQuery?: string,
+    filterParameters?: Omit<
+      FilteringOptionsDto,
+      'expectedSalaryFrom' | 'expectedSalaryTo'
+    >,
+  ) {
+    const parameters = filterParameters
+      ? { ...filterParameters, available: StudentStatus.AVAILABLE }
+      : { available: StudentStatus.AVAILABLE };
     await this.verificationStudentBookingTime();
-    return (
-      this.dataSource
-        .createQueryBuilder()
-        .select([
-          'student.id',
-          'student.courseCompletion',
-          'student.courseEngagement',
-          'student.projectDegree',
-          'student.teamProjectDegree',
-          'sInfo.firstName',
-          'sInfo.lastName',
-          'sInfo.expectedTypeWork',
-          'sInfo.targetWorkCity',
-          'sInfo.expectedSalary',
-          'sInfo.targetWorkCity',
-          'sInfo.expectedSalary',
-          'sInfo.canTakeApprenticeship',
-          'sInfo.monthsOfCommercialExp',
-        ])
-        .from(StudentProfile, 'student')
-        .leftJoin('student.user', 'user')
-        .leftJoin('student.studentInfo', 'sInfo')
-        // .leftJoin('student.hrProfile', 'hrProfile')
-        .where('user.isActive = true AND student.status = :available', {
-          available: StudentStatus.AVAILABLE,
-        })
-        .getMany()
-    );
+    return this.dataSource
+      .createQueryBuilder()
+      .select([
+        'student.id',
+        'student.courseCompletion',
+        'student.courseEngagement',
+        'student.projectDegree',
+        'student.teamProjectDegree',
+        'sInfo.firstName',
+        'sInfo.lastName',
+        'sInfo.expectedTypeWork',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.targetWorkCity',
+        'sInfo.expectedSalary',
+        'sInfo.canTakeApprenticeship',
+        'sInfo.monthsOfCommercialExp',
+      ])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.user', 'user')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .where(
+        `user.isActive = true AND student.status = :available 
+        ${filterQuery ?? ''}`,
+        parameters,
+      )
+      .getMany();
+
   }
 
   async getReservedStudents(user: User) {
@@ -165,6 +177,30 @@ export class StudentService {
       .leftJoin('student.hrProfile', 'hrProfile')
       .where('hrProfile.userId = :userId ', { userId: user.id })
       .getMany();
+  }
+
+  async getFilteredStudents(filteringOptions: FilteringOptionsDto) {
+    const {
+      expectedContractType,
+      teamProjectDegree,
+      canTakeApprenticeship,
+      courseEngagement,
+      courseCompletion,
+      monthsOfCommercialExp,
+      projectDegree,
+    } = filteringOptions;
+    const parameters = {
+      expectedContractType,
+      teamProjectDegree,
+      canTakeApprenticeship,
+      courseEngagement,
+      courseCompletion,
+      monthsOfCommercialExp,
+      projectDegree,
+    };
+    const filterQuery = filteringQueryBuilder(filteringOptions);
+
+    return this.getAllAvailable(filterQuery, parameters);
   }
 
   async getDetailedStudent(user: User, studentId: string) {
@@ -234,7 +270,7 @@ export class StudentService {
         reserved: StudentStatus.RESERVED,
       })
       .getMany();
-
+    if (reservedStudents.length === 0) return;
     for (const student of reservedStudents) {
       if (isReservationValid(student.bookingDateTo)) {
         student.status = StudentStatus.AVAILABLE;

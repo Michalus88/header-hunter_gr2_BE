@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Min } from 'class-validator';
+import { IsEmail, IsNotEmpty, Max, Min } from 'class-validator';
 import { HrProfileRegister } from 'types';
 
 export class HrRegisterDto implements HrProfileRegister {
@@ -16,6 +16,7 @@ export class HrRegisterDto implements HrProfileRegister {
   company: string;
 
   @Min(1)
+  @Max(999)
   @IsNotEmpty()
   maxReservedStudents: number;
 }

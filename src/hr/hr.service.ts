@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { User } from '../user/user.entity';
 import { HrProfile } from './hr-profile.entity';
 import { StudentStatus } from '../../types';
@@ -21,7 +25,12 @@ export class HrService {
       .from(HrProfile, 'hrProfile')
       .where('hrProfile.user = :userId', { userId: user.id })
       .getOne();
-
+    if (!hrProfile) {
+      throw new ForbiddenException(
+        'You are not logged in or Your data has been modified.',
+      );
+    }
+    console.log(setMaxReservationTime(10));
     studentProfile.hrProfile = hrProfile;
     studentProfile.status = StudentStatus.RESERVED;
     studentProfile.bookingDateTo = setMaxReservationTime(10);

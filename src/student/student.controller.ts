@@ -13,6 +13,7 @@ import {
 import { StudentService } from './student.service';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { FilteringOptions } from '../../types';
 import { IsHr } from '../guards/is-hr';
 import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { GithubUserValidate } from 'src/interceptors/gihub-user-validate.interceptor';
@@ -44,6 +45,12 @@ export class StudentController {
   @UseGuards(JwtAuthGuard, IsHr)
   getAllAvailable() {
     return this.studentService.getAllAvailable();
+  }
+
+  @UseGuards(JwtAuthGuard, IsHr)
+  @Get('/filtered')
+  getFilteredStudent(@Body() filteringOptions: FilteringOptions) {
+    return this.studentService.getFilteredStudents(filteringOptions);
   }
 
   @Post('/activate/:userId/:registerToken')

@@ -31,3 +31,9 @@ export interface StudentRegisterResponse {
     emails: string[];
   };
 }
+
+export interface PasswordChange {
+  oldPassword: string;
+  newPassword: string;
+  repeatPassword: string;
+}
