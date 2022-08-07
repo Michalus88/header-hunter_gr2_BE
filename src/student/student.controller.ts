@@ -32,7 +32,7 @@ export class StudentController {
   studentProfileUpdate(
     @UserObj() user: User,
     @Body() studentProfileUpdateDto,
-    @Param('userId') studentId: string,
+    @Param('studentId') studentId: string,
   ) {
     return this.studentService.studentProfileUpdate(
       user,
