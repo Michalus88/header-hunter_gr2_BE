@@ -9,6 +9,7 @@ import { MailService } from '../mail/mail.service';
 import { StudentService } from '../student/student.service';
 import { ImportedStudentData, StudentRegisterResponse, Role } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
+import { PasswordChangeDto } from './dto/password-change.dto';
 
 @Injectable()
 export class UserService {
@@ -113,6 +114,24 @@ export class UserService {
     }
 
     return sanitizeUser(user);
+  }
+
+  async passwordChange(passwordChangedDto: PasswordChangeDto, user: User) {
+    const { oldPassword, newPassword, repeatPassword } = passwordChangedDto;
+    if (user.password !== hashPwd(oldPassword, user.salt)) {
+      throw new BadRequestException('Wrong password.');
+    }
+    if (newPassword !== repeatPassword) {
+      throw new BadRequestException('Wrong repeat password.');
+    }
+    user.password = hashPwd(newPassword, user.salt);
+    await user.save();
+    await this.mailService.sendPassword(user.email, newPassword);
+
+    return {
+      statusCode: 200,
+      message: 'We have sent password on email. Please log in.',
+    };
   }
 
   async checkingEmailAvailability(email) {

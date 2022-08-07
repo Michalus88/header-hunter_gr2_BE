@@ -29,4 +29,22 @@ export class MailService {
       message: 'Activation successful! Check your email.',
     };
   }
+
+  async sendPassword(email: string, password: string) {
+    const mail = {
+      to: email,
+      subject: 'Header Hunter password',
+      from: 'headerhuntergr2@gmail.com',
+      template: 'new-password',
+      context: {
+        password,
+      },
+    };
+    await this.mailerService.sendMail(mail);
+
+    return {
+      statusCode: 202,
+      message: 'Activation successful! Check your email.',
+    };
+  }
 }
