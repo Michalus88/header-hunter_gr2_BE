@@ -32,7 +32,6 @@ export class UserService {
     const profile = new HrProfile();
     profile.firstName = firstName;
     profile.lastName = lastName;
-    profile.email = email;
     profile.company = company;
     profile.maxReservedStudents = maxReservedStudents;
     profile.user = user;
