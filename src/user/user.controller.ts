@@ -69,4 +69,12 @@ export class UserController {
   ) {
     return this.userService.passwordChange(passwordChangedDto, user);
   }
+
+  @Patch('/password-recovery')
+  passwordRecovery(
+    @Body() passwordRecovery: PasswordRecovery,
+    @Res() res: Response,
+  ) {
+    return this.userService.passwordRecovery(passwordRecovery, res);
+  }
 }

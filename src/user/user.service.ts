@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { hashPwd } from '../utils/hash-pwd';
 import { uuid } from 'uuidv4';
 import { sanitizeUser } from '../utils/sanitize-user';
@@ -7,20 +13,23 @@ import { User } from './user.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { MailService } from '../mail/mail.service';
 import { StudentService } from '../student/student.service';
-import { ImportedStudentData, StudentRegisterResponse, Role } from 'types';
+import {
+  ImportedStudentData,
+  StudentRegisterResponse,
+  Role,
+  PasswordRecovery,
+} from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 import { PasswordChangeDto } from './dto/password-change.dto';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private mailService: MailService,
     private studentService: StudentService,
+    @Inject(forwardRef(() => AuthService)) private authService: AuthService,
   ) {}
-
-  async getByEmail(email: string): Promise<User | null> {
-    return await User.findOneBy({ email });
-  }
 
   async hrRegister(hrRegisterDto: HrRegisterDto) {
     const { email, firstName, lastName, company, maxReservedStudents } =
@@ -131,6 +140,27 @@ export class UserService {
       statusCode: 200,
       message: 'We have sent password on email. Please log in.',
     };
+  }
+
+  async passwordRecovery(passwordRecovery: PasswordRecovery, res: Response) {
+    const user = await this.getByEmail(passwordRecovery.email);
+    if (!user) {
+      throw new BadRequestException(
+        'The user with the given email do not exist.',
+      );
+    }
+    const newPassword = uuid();
+    user.password = hashPwd(newPassword, user.salt);
+    await user.save();
+    await this.mailService.sendPassword(user.email, newPassword);
+    this.authService.logout(res, {
+      statusCode: 200,
+      message: 'Success. Check Your mail.',
+    });
+  }
+
+  async getByEmail(email: string): Promise<User | null> {
+    return await User.findOneBy({ email });
   }
 
   async checkingEmailAvailability(email) {
