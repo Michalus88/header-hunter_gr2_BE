@@ -114,6 +114,20 @@ export class StudentService {
     }
   }
 
+  async getMe(user: User) {
+    const student = await this.dataSource
+      .createQueryBuilder()
+      .select('student.id')
+      .from(StudentProfile, 'student')
+      .where('student.userId = :userId', { userId: user.id })
+      .getOne();
+    const studentData = await StudentProfile.find({
+      relations: ['studentInfo'],
+      where: { id: student.id },
+    });
+    return { ...studentData[0], email: user.email };
+  }
+
   async getAllAvailable(
     filterQuery?: string,
     filterParameters?: Omit<
