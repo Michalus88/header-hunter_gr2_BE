@@ -10,3 +10,5 @@ SENDGRID_PASS=
 
 COOKIE_SECURE=false
 DOMAIN=localhost
+
+FRONTEND_DOMAIN=http://localhost:3000
