@@ -11,6 +11,7 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
+  app.enableCors();
   await app.listen(3001);
 }
 bootstrap();
