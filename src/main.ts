@@ -11,7 +11,11 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
-  app.enableCors();
+  app.enableCors({
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    origin: process.env.FRONTEND_DOMAIN,
+  });
   await app.listen(3001);
 }
 bootstrap();
