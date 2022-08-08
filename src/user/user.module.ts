@@ -3,11 +3,16 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MailModule } from '../mail/mail.module';
 import { StudentModule } from '../student/student.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  providers: [UserService],
-  imports: [forwardRef(() => MailModule), forwardRef(() => StudentModule)],
+  imports: [
+    forwardRef(() => MailModule),
+    forwardRef(() => StudentModule),
+    forwardRef(() => AuthModule),
+  ],
   controllers: [UserController],
+  providers: [UserService],
   exports: [UserService],
 })
 export class UserModule {}

@@ -32,7 +32,7 @@ export class HrController {
 
   @Patch('/booking-student/:studentId')
   @UseGuards(JwtAuthGuard, IsHr)
-  getAvailable(@UserObj() user: User, @Param('studentId') studentId: string) {
+  bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
     return this.hrService.bookingStudent(user, studentId);
   }
 }
