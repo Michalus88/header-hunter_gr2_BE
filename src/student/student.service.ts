@@ -1,15 +1,14 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import {
-  ImportedStudentData,
-  StudentProfileUpdate,
-  StudentStatus,
-} from 'types';
+import { ImportedStudentData, StudentStatus } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
@@ -23,11 +22,14 @@ import { isReservationValid } from '../utils/is-reservation-valid';
 import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { FilteringOptionsDto } from './dto/filtering-options.dto';
 import { filteringQueryBuilder } from '../utils/filtering-query-builder';
-
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class StudentService {
-  constructor(private dataSource: DataSource) {}
+  constructor(
+    private dataSource: DataSource,
+    @Inject(forwardRef(() => AuthService)) private authService: AuthService,
+  ) {}
 
   async activateProfile(
     studentProfileActivation: StudentProfileActivationDto,
@@ -150,7 +152,6 @@ export class StudentService {
         parameters,
       )
       .getMany();
-
   }
 
   async getReservedStudents(user: User) {
@@ -285,7 +286,9 @@ export class StudentService {
     user: User,
     studentProfileUpdateDto: StudentProfileUpdateDto,
     studentId: string,
+    res: Response,
   ) {
+    let isMailEdited = false;
     const { studentInfo: sInfo } = await this.dataSource
       .createQueryBuilder()
       .select(['student.id', 'sInfo.id'])
@@ -295,7 +298,13 @@ export class StudentService {
         studentId,
       })
       .getOne();
+    if (!sInfo) {
+      throw new BadRequestException('The student do not exist.');
+    }
     const studentInfo = await StudentInfo.findOneBy({ id: sInfo.id });
+    if (!studentInfo) {
+      throw new BadRequestException('The student is not activate.');
+    }
     const {
       email,
       firstName,
@@ -316,6 +325,7 @@ export class StudentService {
       portfolioUrls,
     } = studentProfileUpdateDto;
 
+    if (email !== user.email) isMailEdited = true;
     user.email = email ?? user.email;
     studentInfo.firstName = firstName ?? studentInfo.firstName;
     studentInfo.lastName = lastName ?? studentInfo.lastName;
@@ -347,6 +357,17 @@ export class StudentService {
     if (projectUrls.length > 0) {
       await this.removeUrls(studentInfo.projectUrls);
       await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
+    }
+    if (isMailEdited) {
+      return this.authService.logout(res, {
+        statusCode: 200,
+        message: 'Success.If the email is edited you have to log in again',
+      });
+    } else {
+      return res.json({
+        statusCode: 200,
+        message: 'Success.',
+      });
     }
   }
 

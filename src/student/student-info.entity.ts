@@ -70,12 +70,12 @@ export class StudentInfo
   @Column({ type: 'tinyint', default: 0 })
   monthsOfCommercialExp: number;
 
-  @Column({ type: 'multilinestring', nullable: true, default: null })
+  @Column({ type: 'text', nullable: true })
   education: string;
 
-  @Column({ type: 'multilinestring', nullable: true, default: null })
+  @Column({ type: 'text', nullable: true })
   workExperience: string;
 
-  @Column({ type: 'multilinestring', nullable: true, default: null })
+  @Column({ type: 'text', nullable: true })
   courses: string;
 }

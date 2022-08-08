@@ -37,3 +37,7 @@ export interface PasswordChange {
   newPassword: string;
   repeatPassword: string;
 }
+
+export interface PasswordRecovery {
+  email: string;
+}

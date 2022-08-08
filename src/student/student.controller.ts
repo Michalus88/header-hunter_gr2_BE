@@ -7,9 +7,11 @@ import {
   Post,
   Put,
   Req,
+  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { StudentService } from './student.service';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -33,11 +35,13 @@ export class StudentController {
     @UserObj() user: User,
     @Body() studentProfileUpdateDto,
     @Param('studentId') studentId: string,
+    @Res() res: Response,
   ) {
     return this.studentService.studentProfileUpdate(
       user,
       studentProfileUpdateDto,
       studentId,
+      res,
     );
   }
 
