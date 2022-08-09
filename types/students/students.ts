@@ -71,6 +71,16 @@ export interface AvailableStudentRes
   >;
 }
 
+export interface AvailableStudentWhitPaginationRes {
+  students: AvailableStudentRes[];
+  pages: {
+    maxPerPage: number;
+    currentPage: number;
+    studentsCount: number;
+    totalPages: number;
+  };
+}
+
 export interface ReservedStudentRes extends AvailableStudentRes {
   status: StudentStatus;
   bookingDateTo: Date;

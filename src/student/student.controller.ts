@@ -3,10 +3,8 @@ import {
   Controller,
   Get,
   Param,
-  Patch,
   Post,
   Put,
-  Req,
   Res,
   UseGuards,
   UseInterceptors,
@@ -17,7 +15,6 @@ import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { FilteringOptions } from '../../types';
 import { IsHr } from '../guards/is-hr';
-import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { GithubUserValidate } from 'src/interceptors/gihub-user-validate.interceptor';
 import { EmailExistInDBValidate } from 'src/interceptors/email-exist-in-DB-validate.interceptor';
 import { UserObj } from '../decorators/user-object.decorator';
@@ -45,10 +42,16 @@ export class StudentController {
     );
   }
 
-  @Get('/available')
+  @Get('/available/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
-  getAllAvailable() {
-    return this.studentService.getAllAvailable();
+  getAllAvailableWhitPagination(
+    @Param('maxPerPage') maxPerPage: number,
+    @Param('currentPage') currentPage: number,
+  ) {
+    return this.studentService.getAllAvailableWhitPagination(
+      maxPerPage,
+      currentPage,
+    );
   }
 
   @UseGuards(JwtAuthGuard, IsHr)
