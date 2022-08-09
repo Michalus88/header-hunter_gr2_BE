@@ -145,7 +145,7 @@ export class StudentService {
       ? { ...filterParameters, available: StudentStatus.AVAILABLE }
       : { available: StudentStatus.AVAILABLE };
     await this.verificationStudentBookingTime();
-    return this.dataSource
+    return (await this.dataSource
       .createQueryBuilder()
       .select([
         'student.id',
@@ -179,6 +179,7 @@ export class StudentService {
     return this.dataSource
       .createQueryBuilder()
       .select([
+        'hrProfile',
         'student.id',
         'student.courseCompletion',
         'student.courseEngagement',
