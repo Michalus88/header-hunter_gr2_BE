@@ -28,6 +28,12 @@ import { User } from './user.entity';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('/')
+  @UseGuards(JwtAuthGuard)
+  getStartData(@UserObj() user: User) {
+    return this.userService.getMe(user);
+  }
+
   @Get('/student/activate/:userId/:registerToken')
   accountActivation(
     @Param('userId') userId: string,

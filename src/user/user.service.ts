@@ -15,13 +15,14 @@ import { MailService } from '../mail/mail.service';
 import { StudentService } from '../student/student.service';
 import {
   ImportedStudentData,
-  StudentRegisterResponse,
-  Role,
   PasswordRecovery,
+  Role,
+  StudentRegisterResponse,
 } from 'types';
 import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 import { PasswordChangeDto } from './dto/password-change.dto';
 import { AuthService } from '../auth/auth.service';
+import { HrService } from '../hr/hr.service';
 
 @Injectable()
 export class UserService {
@@ -29,6 +30,7 @@ export class UserService {
     private mailService: MailService,
     private studentService: StudentService,
     @Inject(forwardRef(() => AuthService)) private authService: AuthService,
+    @Inject(forwardRef(() => HrService)) private hrService: HrService,
   ) {}
 
   async hrRegister(hrRegisterDto: HrRegisterDto) {
@@ -122,6 +124,19 @@ export class UserService {
     }
 
     return sanitizeUser(user);
+  }
+
+  async getMe(user: User) {
+    switch (user.role) {
+      case Role.STUDENT:
+        return this.studentService.getMe(user);
+      case Role.HR:
+        return this.hrService.getMe(user);
+      case Role.ADMIN:
+        return sanitizeUser(user);
+      default:
+        throw new BadRequestException('Role does not exist.');
+    }
   }
 
   async passwordChange(passwordChangedDto: PasswordChangeDto, user: User) {
