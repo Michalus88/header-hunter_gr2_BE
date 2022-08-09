@@ -27,12 +27,17 @@ export enum ExpectedContractType {
   COMMISSION_CONTRACT_OR_SPECIFIC_TASK_CONTRACT,
 }
 
+interface UrlEntity {
+  id: string;
+  url: string;
+}
+
 export interface StudentProfileRegister {
   tel: string | undefined;
   firstName: string;
   lastName: string;
   githubUsername: string;
-  portfolioUrls: string[] | undefined;
+  portfolioUrls: string[] | [];
   projectUrls: string[];
   bio: string | undefined;
   expectedTypeWork: ExpectedTypeWork;
@@ -51,17 +56,19 @@ export interface StudentProfileUpdate extends StudentProfileRegister {
 }
 
 export interface AvailableStudentRes
-  extends Omit<ImportedStudentData, 'email' | 'bonusProjectUrls'>,
-    Pick<
-      StudentProfileRegister,
-      | 'expectedTypeWork'
-      | 'targetWorkCity'
-      | 'expectedContractType'
-      | 'expectedSalary'
-      | 'canTakeApprenticeship'
-      | 'workExperience'
-    > {
+  extends Omit<ImportedStudentData, 'email' | 'bonusProjectUrls'> {
   id: string;
+  studentInfo: Pick<
+    StudentProfileRegister,
+    | 'firstName'
+    | 'lastName'
+    | 'expectedTypeWork'
+    | 'targetWorkCity'
+    | 'expectedContractType'
+    | 'expectedSalary'
+    | 'canTakeApprenticeship'
+    | 'workExperience'
+  >;
 }
 
 export interface ReservedStudentRes extends AvailableStudentRes {
@@ -76,11 +83,19 @@ export interface DetailedStudentDataRes
   user: { email: string };
 }
 
-export interface StudentDataRes
-  extends ImportedStudentData,
-    StudentProfileRegister {
+interface StudentInfo
+  extends Omit<StudentProfileRegister, 'portfolioUrls' | 'projectUrls'> {
+  portfolioUrls: UrlEntity[] | [];
+  projectUrls: UrlEntity[];
+}
+
+export interface StudentStartDataRes
+  extends Omit<ImportedStudentData, 'bonusProjectUrls'> {
   id: string;
   status: StudentStatus;
+  email: string;
+  studentInfo: StudentInfo;
+  bonusProjectUrls: UrlEntity[];
 }
 
 export interface FilteringOptions {
