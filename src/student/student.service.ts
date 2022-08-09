@@ -127,9 +127,10 @@ export class StudentService {
       .where('student.userId = :userId', { userId: user.id })
       .getOne();
     const studentData = await StudentProfile.find({
-      relations: ['studentInfo'],
+      relations: ['studentInfo', 'bonusProjectUrls'],
       where: { id: student.id },
     });
+
     return { ...studentData[0], email: user.email };
   }
 
