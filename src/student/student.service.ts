@@ -8,7 +8,12 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { ImportedStudentData, StudentStatus } from 'types';
+import {
+  AvailableStudentRes,
+  ImportedStudentData,
+  StudentStartDataRes,
+  StudentStatus,
+} from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
@@ -114,7 +119,7 @@ export class StudentService {
     }
   }
 
-  async getMe(user: User) {
+  async getMe(user: User): Promise<StudentStartDataRes> {
     const student = await this.dataSource
       .createQueryBuilder()
       .select('student.id')
@@ -165,7 +170,7 @@ export class StudentService {
         ${filterQuery ?? ''}`,
         parameters,
       )
-      .getMany();
+      .getMany()) as unknown as AvailableStudentRes[];
   }
 
   async getReservedStudents(user: User) {
