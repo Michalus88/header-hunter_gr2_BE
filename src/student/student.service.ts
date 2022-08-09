@@ -28,6 +28,7 @@ import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { FilteringOptionsDto } from './dto/filtering-options.dto';
 import { filteringQueryBuilder } from '../utils/filtering-query-builder';
 import { AuthService } from '../auth/auth.service';
+import { pagination } from 'src/utils/pagination';
 
 @Injectable()
 export class StudentService {
@@ -167,11 +168,19 @@ export class StudentService {
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
       .where(
-        `user.isActive = true AND student.status = :available 
+        `user.isActive = true AND student.status = :available
         ${filterQuery ?? ''}`,
         parameters,
       )
       .getMany()) as unknown as AvailableStudentRes[];
+  }
+
+  async getAllAvailableWhitPagination(
+    maxPerPage?: number,
+    currentPage?: number,
+  ) {
+    const allAvailable = await this.getAllAvailable();
+    return pagination(allAvailable, Number(maxPerPage), Number(currentPage));
   }
 
   async getReservedStudents(user: User) {
