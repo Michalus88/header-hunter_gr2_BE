@@ -7,5 +7,6 @@ import { StudentModule } from '../student/student.module';
   imports: [forwardRef(() => StudentModule)],
   controllers: [HrController],
   providers: [HrService],
+  exports: [HrService],
 })
 export class HrModule {}

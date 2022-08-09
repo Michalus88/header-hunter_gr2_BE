@@ -8,7 +8,12 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { ImportedStudentData, StudentStatus } from 'types';
+import {
+  AvailableStudentRes,
+  ImportedStudentData,
+  StudentStartDataRes,
+  StudentStatus,
+} from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
@@ -114,6 +119,21 @@ export class StudentService {
     }
   }
 
+  async getMe(user: User): Promise<StudentStartDataRes> {
+    const student = await this.dataSource
+      .createQueryBuilder()
+      .select('student.id')
+      .from(StudentProfile, 'student')
+      .where('student.userId = :userId', { userId: user.id })
+      .getOne();
+    const studentData = await StudentProfile.find({
+      relations: ['studentInfo', 'bonusProjectUrls'],
+      where: { id: student.id },
+    });
+
+    return { ...studentData[0], email: user.email };
+  }
+
   async getAllAvailable(
     filterQuery?: string,
     filterParameters?: Omit<
@@ -125,7 +145,7 @@ export class StudentService {
       ? { ...filterParameters, available: StudentStatus.AVAILABLE }
       : { available: StudentStatus.AVAILABLE };
     await this.verificationStudentBookingTime();
-    return this.dataSource
+    return (await this.dataSource
       .createQueryBuilder()
       .select([
         'student.id',
@@ -151,7 +171,7 @@ export class StudentService {
         ${filterQuery ?? ''}`,
         parameters,
       )
-      .getMany();
+      .getMany()) as unknown as AvailableStudentRes[];
   }
 
   async getReservedStudents(user: User) {
@@ -159,6 +179,7 @@ export class StudentService {
     return this.dataSource
       .createQueryBuilder()
       .select([
+        'hrProfile',
         'student.id',
         'student.courseCompletion',
         'student.courseEngagement',
