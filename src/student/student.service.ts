@@ -11,8 +11,8 @@ import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import {
   AvailableStudentRes,
   ImportedStudentData,
-  StudentStartDataRes,
   StudentStatus,
+  LoggedUserRes,
 } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
@@ -120,19 +120,22 @@ export class StudentService {
     }
   }
 
-  async getMe(user: User): Promise<StudentStartDataRes> {
+  async getMe(user: User): Promise<LoggedUserRes> {
     const student = await this.dataSource
       .createQueryBuilder()
-      .select('student.id')
+      .select(['sInfo.firstName', 'sInfo.lastName', 'student.id'])
       .from(StudentProfile, 'student')
+      .leftJoin('student.studentInfo', 'sInfo')
       .where('student.userId = :userId', { userId: user.id })
       .getOne();
-    const studentData = await StudentProfile.find({
-      relations: ['studentInfo', 'bonusProjectUrls'],
-      where: { id: student.id },
-    });
-
-    return { ...studentData[0], email: user.email };
+    const { firstName, lastName } = student.studentInfo;
+    return {
+      id: user.id,
+      role: user.role,
+      firstName,
+      lastName,
+      email: user.email,
+    };
   }
 
   async getAllAvailable(

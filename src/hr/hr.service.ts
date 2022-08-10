@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { User } from '../user/user.entity';
 import { HrProfile } from './hr-profile.entity';
-import { HrStartDataRes, StudentStatus } from '../../types';
+import { HrStartDataRes, LoggedUserRes, StudentStatus } from '../../types';
 import { DataSource } from 'typeorm';
 import { StudentService } from '../student/student.service';
 import { setMaxReservationTime } from '../utils/set-max-reservation-time';
@@ -17,16 +17,15 @@ export class HrService {
     private studentService: StudentService,
   ) {}
 
-  async getMe(user: User): Promise<HrStartDataRes> {
+  async getMe(user: User): Promise<LoggedUserRes> {
     const hr = await this.dataSource
       .createQueryBuilder()
-      .select('hrProfile')
+      .select(['hrProfile.firstName', 'hrProfile.lastName'])
       .from(HrProfile, 'hrProfile')
       .where('hrProfile.user = :userId', { userId: user.id })
       .getOne();
-    const availableStudents = await this.studentService.getAllAvailable();
-    const hrProfile = { ...hr, email: user.email };
-    return { hrProfile, availableStudents };
+
+    return { id: user.id, role: user.role, ...hr, email: user.email };
   }
 
   async bookingStudent(user: User, studentId: string) {
