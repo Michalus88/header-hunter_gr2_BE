@@ -287,11 +287,7 @@ export class StudentService {
     if (studentProfile.status === StudentStatus.HIRED) {
       throw new ForbiddenException('This student is already hired.');
     }
-    if (studentProfile.bookingDateTo) {
-      throw new ForbiddenException(
-        `The Student with the id: ${studentId} is already booked.`,
-      );
-    }
+
     return studentProfile;
   }
 
