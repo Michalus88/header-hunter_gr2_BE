@@ -41,7 +41,7 @@ export class HrService {
         'You are not logged in or Your data has been modified.',
       );
     }
-    studentProfile.hrProfile = hrProfile;
+    studentProfile.hrProfile.push(hrProfile);
     studentProfile.status = StudentStatus.RESERVED;
     studentProfile.bookingDateTo = setMaxReservationTime(10);
     await studentProfile.save();
