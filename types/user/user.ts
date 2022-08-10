@@ -14,10 +14,12 @@ export interface UserData {
   registerToken: string | null;
 }
 
-export type UserRes = Omit<
-  UserData,
-  'password' | 'isActive' | 'salt' | 'registerToken'
->;
+export type UserRes = Pick<UserData, 'id' | 'role' | 'email'>;
+
+export interface LoggedUserRes extends UserRes {
+  firstName: string;
+  lastName: string;
+}
 
 export interface StudentRegisterResponse {
   numberOfStudentsToRegister: number;
@@ -32,10 +34,21 @@ export interface StudentRegisterResponse {
   };
 }
 
+export interface Login {
+  email: string;
+  password: string;
+}
+
 export interface PasswordChange {
   oldPassword: string;
   newPassword: string;
   repeatPassword: string;
+}
+
+export interface EmailChange {
+  oldEmail: string;
+  newEmail: string;
+  repeatNewEmail: string;
 }
 
 export interface PasswordRecovery {
