@@ -3,6 +3,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -52,6 +54,7 @@ export class StudentProfile extends BaseEntity {
   @Column({ type: 'datetime', nullable: true })
   bookingDateTo: Date;
 
-  @ManyToOne((type) => HrProfile, (entity) => entity.reservedStudents)
-  hrProfile: HrProfile;
+  @ManyToMany((type) => HrProfile, (entity) => entity.reservedStudents)
+  @JoinTable()
+  hrProfile: HrProfile[];
 }

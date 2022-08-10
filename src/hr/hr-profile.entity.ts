@@ -3,7 +3,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToMany,
+  ManyToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -40,6 +40,6 @@ export class HrProfile
   })
   maxReservedStudents: number;
 
-  @OneToMany(() => StudentProfile, (entity) => entity.hrProfile)
+  @ManyToMany(() => StudentProfile, (entity) => entity.hrProfile)
   reservedStudents: StudentProfile[];
 }
