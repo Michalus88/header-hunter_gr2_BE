@@ -264,7 +264,6 @@ export class StudentService {
     studentId: string,
     res: Response,
   ) {
-    let isMailEdited = false;
     const { studentInfo: sInfo } = await this.dataSource
       .createQueryBuilder()
       .select(['student.id', 'sInfo.id'])
@@ -282,7 +281,6 @@ export class StudentService {
       throw new BadRequestException('The student is not activate.');
     }
     const {
-      email,
       firstName,
       lastName,
       tel,
@@ -301,8 +299,6 @@ export class StudentService {
       portfolioUrls,
     } = studentProfileUpdateDto;
 
-    if (email !== user.email) isMailEdited = true;
-    user.email = email ?? user.email;
     studentInfo.firstName = firstName ?? studentInfo.firstName;
     studentInfo.lastName = lastName ?? studentInfo.lastName;
     studentInfo.tel = tel ?? studentInfo.tel;
@@ -321,7 +317,6 @@ export class StudentService {
     studentInfo.monthsOfCommercialExp =
       monthsOfCommercialExp ?? studentInfo.monthsOfCommercialExp;
     studentInfo.education = education ?? studentInfo.education;
-    await user.save();
     await studentInfo.save();
 
     if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
@@ -333,13 +328,7 @@ export class StudentService {
     if (projectUrls.length > 0) {
       await this.removeUrls(studentInfo.projectUrls);
       await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
-    }
-    if (isMailEdited) {
-      return this.authService.logout(res, {
-        statusCode: 200,
-        message: 'Success.If the email is edited you have to log in again',
-      });
-    } else {
+
       return res.json({
         statusCode: 200,
         message: 'Success.',
