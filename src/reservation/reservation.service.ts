@@ -44,8 +44,8 @@ export class ReservationService {
     }
   }
 
-  getBookedStudents(hr: HrProfile) {
-    return this.dataSource
+  async getBookedStudents(hr: HrProfile) {
+    const reservations = await this.dataSource
       .createQueryBuilder()
       .select([
         'reservation.bookingDateTo',
@@ -69,5 +69,10 @@ export class ReservationService {
       .leftJoin('student.studentInfo', 'sInfo')
       .where('reservation.hrProfile = :hrId ', { hrId: hr.id })
       .getMany();
+
+    return reservations.map((reservation) => ({
+      bookingDateTo: reservation.bookingDateTo,
+      ...reservation.studentProfile,
+    }));
   }
 }
