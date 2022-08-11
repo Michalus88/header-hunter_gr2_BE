@@ -26,7 +26,9 @@ export class HrService {
   }
 
   async bookingStudent(user: User, studentId: string) {
-    const studentProfile = await this.studentService.isStudentBooked(studentId);
+    const studentProfile = await this.studentService.getAvailableStudent(
+      studentId,
+    );
     const hrProfile = await this.dataSource
       .createQueryBuilder()
       .select('hrProfile')

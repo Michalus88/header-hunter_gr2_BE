@@ -270,7 +270,7 @@ export class StudentService {
     }
   }
 
-  async isStudentBooked(studentId: string) {
+  async getAvailableStudent(studentId: string) {
     const studentProfile = await this.dataSource
       .createQueryBuilder()
       .select('student')
