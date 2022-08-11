@@ -7,11 +7,6 @@ import {
 } from 'types';
 
 export class StudentProfileUpdateDto implements StudentProfileRegister {
-  ///Email exist in DB validate interceptor
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
   @MaxLength(9)
   tel: string;
 
