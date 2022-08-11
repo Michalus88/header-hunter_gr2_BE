@@ -15,6 +15,8 @@ import { StudentPortfolioUrl } from './student/student-portfolio-url.entity';
 import { BonusProjectUrl } from './student/student-bonus-project-url.entity';
 import { HrProfile } from './hr/hr-profile.entity';
 import { StudentInfo } from './student/student-info.entity';
+import { Reservation } from './reservation/reservation.entity';
+import { ReservationModule } from './reservation/reservation.module';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { StudentInfo } from './student/student-info.entity';
         StudentProfile,
         StudentInfo,
         StudentProjectUrl,
+        Reservation,
       ],
       bigNumberStrings: false,
       logging: true,
@@ -43,6 +46,7 @@ import { StudentInfo } from './student/student-info.entity';
     HrModule,
     StudentModule,
     MailModule,
+    ReservationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
