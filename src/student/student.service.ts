@@ -13,6 +13,7 @@ import {
   ImportedStudentData,
   StudentStatus,
   LoggedUserRes,
+  Role,
 } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
@@ -23,7 +24,6 @@ import { validateActivationCredentials } from '../utils/validate-activation-cred
 import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
-import { isReservationValid } from '../utils/is-reservation-valid';
 import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { FilteringOptionsDto } from './dto/filtering-options.dto';
 import { filteringQueryBuilder } from '../utils/filtering-query-builder';
@@ -44,6 +44,9 @@ export class StudentService {
   ) {
     const user = await User.findOneBy({ id: userId });
     validateActivationCredentials(user, registerToken);
+    if (user.role !== Role.STUDENT) {
+      throw new ForbiddenException('Only for student activation.');
+    }
     const studentProfile = await this.dataSource
       .createQueryBuilder()
       .select('studentProfile')
@@ -86,7 +89,6 @@ export class StudentService {
       studentInfo.workExperience = workExperience ?? null;
       studentInfo.courses = courses ?? null;
       await studentInfo.save();
-
       studentProfile.studentInfo = studentInfo;
       await studentProfile.save();
 
@@ -98,14 +100,12 @@ export class StudentService {
           await portfolioUrlsEntity.save();
         }
       }
-
       for (const url of projectUrls) {
         const projectUrlsEntity = new StudentProjectUrl();
         projectUrlsEntity.studentInfo = studentInfo;
         projectUrlsEntity.url = url;
         await projectUrlsEntity.save();
       }
-
       user.registerToken = null;
       user.isActive = true;
       await user.save();
@@ -148,7 +148,6 @@ export class StudentService {
     const parameters = filterParameters
       ? { ...filterParameters, available: StudentStatus.AVAILABLE }
       : { available: StudentStatus.AVAILABLE };
-    await this.verificationStudentBookingTime();
     return (await this.dataSource
       .createQueryBuilder()
       .select([
@@ -162,19 +161,15 @@ export class StudentService {
         'sInfo.expectedTypeWork',
         'sInfo.targetWorkCity',
         'sInfo.expectedSalary',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
+        'sInfo.expectedContractType',
         'sInfo.canTakeApprenticeship',
+        'sInfo.workExperience',
         'sInfo.monthsOfCommercialExp',
       ])
       .from(StudentProfile, 'student')
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
-      .where(
-        `user.isActive = true AND student.status = :available
-        ${filterQuery ?? ''}`,
-        parameters,
-      )
+      .where(`user.isActive = true ${filterQuery ?? ''}`, parameters)
       .getMany()) as unknown as AvailableStudentRes[];
   }
 
@@ -184,33 +179,6 @@ export class StudentService {
   ) {
     const allAvailable = await this.getAllAvailable();
     return pagination(allAvailable, Number(maxPerPage), Number(currentPage));
-  }
-
-  async getReservedStudents(user: User) {
-    await this.verificationStudentBookingTime();
-    return this.dataSource
-      .createQueryBuilder()
-      .select([
-        'hrProfile',
-        'student.id',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'sInfo.firstName',
-        'sInfo.lastName',
-        'sInfo.expectedTypeWork',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
-        'sInfo.canTakeApprenticeship',
-        'sInfo.monthsOfCommercialExp',
-      ])
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('hrProfile.userId = :userId ', { userId: user.id })
-      .getMany();
   }
 
   async getFilteredStudents(filteringOptions: FilteringOptionsDto) {
@@ -270,7 +238,7 @@ export class StudentService {
     }
   }
 
-  async isStudentBooked(studentId: string) {
+  async getAvailableStudent(studentId: string) {
     const studentProfile = await this.dataSource
       .createQueryBuilder()
       .select('student')
@@ -287,32 +255,8 @@ export class StudentService {
     if (studentProfile.status === StudentStatus.HIRED) {
       throw new ForbiddenException('This student is already hired.');
     }
-    if (studentProfile.bookingDateTo) {
-      throw new ForbiddenException(
-        `The Student with the id: ${studentId} is already booked.`,
-      );
-    }
-    return studentProfile;
-  }
 
-  async verificationStudentBookingTime() {
-    const reservedStudents = await this.dataSource
-      .createQueryBuilder()
-      .select(['student'])
-      .from(StudentProfile, 'student')
-      .where('student.status = :reserved ', {
-        reserved: StudentStatus.RESERVED,
-      })
-      .getMany();
-    if (reservedStudents.length === 0) return;
-    for (const student of reservedStudents) {
-      if (isReservationValid(student.bookingDateTo)) {
-        student.status = StudentStatus.AVAILABLE;
-        student.bookingDateTo = null;
-        student.hrProfile = null;
-        await student.save();
-      }
-    }
+    return studentProfile;
   }
 
   async studentProfileUpdate(
@@ -321,7 +265,6 @@ export class StudentService {
     studentId: string,
     res: Response,
   ) {
-    let isMailEdited = false;
     const { studentInfo: sInfo } = await this.dataSource
       .createQueryBuilder()
       .select(['student.id', 'sInfo.id'])
@@ -339,7 +282,6 @@ export class StudentService {
       throw new BadRequestException('The student is not activate.');
     }
     const {
-      email,
       firstName,
       lastName,
       tel,
@@ -358,8 +300,6 @@ export class StudentService {
       portfolioUrls,
     } = studentProfileUpdateDto;
 
-    if (email !== user.email) isMailEdited = true;
-    user.email = email ?? user.email;
     studentInfo.firstName = firstName ?? studentInfo.firstName;
     studentInfo.lastName = lastName ?? studentInfo.lastName;
     studentInfo.tel = tel ?? studentInfo.tel;
@@ -378,7 +318,6 @@ export class StudentService {
     studentInfo.monthsOfCommercialExp =
       monthsOfCommercialExp ?? studentInfo.monthsOfCommercialExp;
     studentInfo.education = education ?? studentInfo.education;
-    await user.save();
     await studentInfo.save();
 
     if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
@@ -390,13 +329,7 @@ export class StudentService {
     if (projectUrls.length > 0) {
       await this.removeUrls(studentInfo.projectUrls);
       await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
-    }
-    if (isMailEdited) {
-      return this.authService.logout(res, {
-        statusCode: 200,
-        message: 'Success.If the email is edited you have to log in again',
-      });
-    } else {
+
       return res.json({
         statusCode: 200,
         message: 'Success.',

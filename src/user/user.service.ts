@@ -33,6 +33,19 @@ export class UserService {
     @Inject(forwardRef(() => HrService)) private hrService: HrService,
   ) {}
 
+  async getMe(user: User) {
+    switch (user.role) {
+      case Role.STUDENT:
+        return this.studentService.getMe(user);
+      case Role.HR:
+        return this.hrService.getMe(user);
+      case Role.ADMIN:
+        return sanitizeUser(user);
+      default:
+        throw new BadRequestException('Role does not exist.');
+    }
+  }
+
   async hrRegister(hrRegisterDto: HrRegisterDto) {
     const { email, firstName, lastName, company, maxReservedStudents } =
       hrRegisterDto;
@@ -86,7 +99,6 @@ export class UserService {
     for (const student of students) {
       response.numberOfStudentsToRegister++;
       const user = await this.getByEmail(student.email);
-
       if (user) {
         response.emailsAlreadyRegistered.number++;
         response.emailsAlreadyRegistered.emails.push(user.email);
@@ -124,19 +136,6 @@ export class UserService {
     }
 
     return sanitizeUser(user);
-  }
-
-  async getMe(user: User) {
-    switch (user.role) {
-      case Role.STUDENT:
-        return this.studentService.getMe(user);
-      case Role.HR:
-        return this.hrService.getMe(user);
-      case Role.ADMIN:
-        return sanitizeUser(user);
-      default:
-        throw new BadRequestException('Role does not exist.');
-    }
   }
 
   async passwordChange(passwordChangedDto: PasswordChangeDto, user: User) {

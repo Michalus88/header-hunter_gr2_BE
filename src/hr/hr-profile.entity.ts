@@ -7,10 +7,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { HrProfileRegister } from 'types';
-import { StudentProfile } from '../student/student-profile.entity';
 import { User } from '../user/user.entity';
+import { Reservation } from '../reservation/reservation.entity';
 
 @Entity()
 export class HrProfile
@@ -40,6 +39,6 @@ export class HrProfile
   })
   maxReservedStudents: number;
 
-  @OneToMany(() => StudentProfile, (entity) => entity.hrProfile)
-  reservedStudents: StudentProfile[];
+  @OneToMany(() => Reservation, (reservations) => reservations.hrProfile)
+  reservations: Reservation[];
 }

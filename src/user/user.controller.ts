@@ -30,11 +30,11 @@ export class UserController {
 
   @Get('/')
   @UseGuards(JwtAuthGuard)
-  getStartData(@UserObj() user: User) {
+  getMe(@UserObj() user: User) {
     return this.userService.getMe(user);
   }
 
-  @Get('/student/activate/:userId/:registerToken')
+  @Patch('/activate/:userId/:registerToken')
   accountActivation(
     @Param('userId') userId: string,
     @Param('registerToken') registerToken: string,

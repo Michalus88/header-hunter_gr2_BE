@@ -3,6 +3,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -13,6 +15,7 @@ import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import { HrProfile } from '../hr/hr-profile.entity';
 import { User } from '../user/user.entity';
 import { StudentInfo } from './student-info.entity';
+import { Reservation } from '../reservation/reservation.entity';
 
 @Entity()
 export class StudentProfile extends BaseEntity {
@@ -49,9 +52,6 @@ export class StudentProfile extends BaseEntity {
   @OneToMany(() => BonusProjectUrl, (entity) => entity.studentProfile)
   bonusProjectUrls: BonusProjectUrl[];
 
-  @Column({ type: 'datetime', nullable: true })
-  bookingDateTo: Date;
-
-  @ManyToOne((type) => HrProfile, (entity) => entity.reservedStudents)
-  hrProfile: HrProfile;
+  @OneToMany(() => Reservation, (reservations) => reservations.studentProfile)
+  reservations: Reservation[];
 }

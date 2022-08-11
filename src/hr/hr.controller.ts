@@ -15,19 +15,28 @@ export class HrController {
     private readonly studentService: StudentService,
   ) {}
 
-  @Get('/reserved-students')
+  @Get('/')
   @UseGuards(JwtAuthGuard, IsHr)
-  getReservedStudents(@UserObj() user: User) {
-    return this.studentService.getReservedStudents(user);
+  getMe(@UserObj() user: User) {
+    return this.hrService.getMe(user);
   }
 
-  @Get('/reserved-students/:studentId')
+  @Get('/booked-students/:studentId')
   @UseGuards(JwtAuthGuard, IsHr)
-  getDetailedStudents(
+  getDetailedStudent(
     @UserObj() user: User,
     @Param('studentId') studentId: string,
   ) {
     return this.studentService.getDetailedStudent(user, studentId);
+  }
+
+  @Get('/booked-students')
+  @UseGuards(JwtAuthGuard, IsHr)
+  getBookedStudents(
+    @UserObj() user: User,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.hrService.getBookedStudents(user);
   }
 
   @Patch('/booking-student/:studentId')

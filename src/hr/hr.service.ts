@@ -1,20 +1,17 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '../user/user.entity';
 import { HrProfile } from './hr-profile.entity';
-import { HrStartDataRes, LoggedUserRes, StudentStatus } from '../../types';
+import { LoggedUserRes } from '../../types';
 import { DataSource } from 'typeorm';
 import { StudentService } from '../student/student.service';
-import { setMaxReservationTime } from '../utils/set-max-reservation-time';
+import { ReservationService } from '../reservation/reservation.service';
 
 @Injectable()
 export class HrService {
   constructor(
     private dataSource: DataSource,
     private studentService: StudentService,
+    private reservationService: ReservationService,
   ) {}
 
   async getMe(user: User): Promise<LoggedUserRes> {
@@ -29,7 +26,9 @@ export class HrService {
   }
 
   async bookingStudent(user: User, studentId: string) {
-    const studentProfile = await this.studentService.isStudentBooked(studentId);
+    const studentProfile = await this.studentService.getAvailableStudent(
+      studentId,
+    );
     const hrProfile = await this.dataSource
       .createQueryBuilder()
       .select('hrProfile')
@@ -41,14 +40,24 @@ export class HrService {
         'You are not logged in or Your data has been modified.',
       );
     }
-    studentProfile.hrProfile = hrProfile;
-    studentProfile.status = StudentStatus.RESERVED;
-    studentProfile.bookingDateTo = setMaxReservationTime(10);
-    await studentProfile.save();
+    await this.reservationService.isStudentBooked(hrProfile, studentId);
+    await this.reservationService.add(hrProfile, studentProfile);
 
     return {
       codeStatus: 200,
       message: `Student with id ${studentId} booked.`,
     };
+  }
+
+  async getBookedStudents(user: User) {
+    await this.reservationService.verificationStudentBookingTime();
+    const hr = await this.dataSource
+      .createQueryBuilder()
+      .select('hr.id')
+      .from(HrProfile, 'hr')
+      .where('hr.user = :userId', { userId: user.id })
+      .getOne();
+
+    return this.reservationService.getBookedStudents(hr);
   }
 }

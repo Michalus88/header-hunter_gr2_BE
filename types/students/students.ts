@@ -68,7 +68,12 @@ export interface AvailableStudentRes
     | 'expectedSalary'
     | 'canTakeApprenticeship'
     | 'workExperience'
+    | 'monthsOfCommercialExp'
   >;
+}
+
+export interface ReservedStudentRes extends AvailableStudentRes {
+  bookingDateTo: Date;
 }
 
 export interface AvailableStudentWhitPaginationRes {
@@ -79,11 +84,6 @@ export interface AvailableStudentWhitPaginationRes {
     studentsCount: number;
     totalPages: number;
   };
-}
-
-export interface ReservedStudentRes extends AvailableStudentRes {
-  status: StudentStatus;
-  bookingDateTo: Date;
 }
 
 export interface DetailedStudentDataRes
