@@ -13,6 +13,7 @@ import {
   ImportedStudentData,
   StudentStatus,
   LoggedUserRes,
+  Role,
 } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
@@ -44,6 +45,9 @@ export class StudentService {
   ) {
     const user = await User.findOneBy({ id: userId });
     validateActivationCredentials(user, registerToken);
+    if (user.role !== Role.STUDENT) {
+      throw new ForbiddenException('Only for student activation.');
+    }
     const studentProfile = await this.dataSource
       .createQueryBuilder()
       .select('studentProfile')
