@@ -161,19 +161,14 @@ export class StudentService {
         'sInfo.expectedTypeWork',
         'sInfo.targetWorkCity',
         'sInfo.expectedSalary',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
+        'sInfo.expectedContractType',
         'sInfo.canTakeApprenticeship',
         'sInfo.monthsOfCommercialExp',
       ])
       .from(StudentProfile, 'student')
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
-      .where(
-        `user.isActive = true AND student.status = :available
-        ${filterQuery ?? ''}`,
-        parameters,
-      )
+      .where(`user.isActive = true ${filterQuery ?? ''}`, parameters)
       .getMany()) as unknown as AvailableStudentRes[];
   }
 
