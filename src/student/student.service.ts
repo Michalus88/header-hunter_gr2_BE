@@ -163,6 +163,7 @@ export class StudentService {
         'sInfo.expectedSalary',
         'sInfo.expectedContractType',
         'sInfo.canTakeApprenticeship',
+        'sInfo.workExperience',
         'sInfo.monthsOfCommercialExp',
       ])
       .from(StudentProfile, 'student')
