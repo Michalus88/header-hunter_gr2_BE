@@ -24,7 +24,6 @@ import { validateActivationCredentials } from '../utils/validate-activation-cred
 import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
-import { isReservationValid } from '../utils/is-reservation-valid';
 import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { FilteringOptionsDto } from './dto/filtering-options.dto';
 import { filteringQueryBuilder } from '../utils/filtering-query-builder';
@@ -90,7 +89,6 @@ export class StudentService {
       studentInfo.workExperience = workExperience ?? null;
       studentInfo.courses = courses ?? null;
       await studentInfo.save();
-
       studentProfile.studentInfo = studentInfo;
       await studentProfile.save();
 
@@ -102,14 +100,12 @@ export class StudentService {
           await portfolioUrlsEntity.save();
         }
       }
-
       for (const url of projectUrls) {
         const projectUrlsEntity = new StudentProjectUrl();
         projectUrlsEntity.studentInfo = studentInfo;
         projectUrlsEntity.url = url;
         await projectUrlsEntity.save();
       }
-
       user.registerToken = null;
       user.isActive = true;
       await user.save();
@@ -152,7 +148,6 @@ export class StudentService {
     const parameters = filterParameters
       ? { ...filterParameters, available: StudentStatus.AVAILABLE }
       : { available: StudentStatus.AVAILABLE };
-    await this.verificationStudentBookingTime();
     return (await this.dataSource
       .createQueryBuilder()
       .select([
@@ -188,33 +183,6 @@ export class StudentService {
   ) {
     const allAvailable = await this.getAllAvailable();
     return pagination(allAvailable, Number(maxPerPage), Number(currentPage));
-  }
-
-  async getReservedStudents(user: User) {
-    await this.verificationStudentBookingTime();
-    return this.dataSource
-      .createQueryBuilder()
-      .select([
-        'hrProfile',
-        'student.id',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'sInfo.firstName',
-        'sInfo.lastName',
-        'sInfo.expectedTypeWork',
-        'sInfo.targetWorkCity',
-        'sInfo.expectedSalary',
-        'sInfo.canTakeApprenticeship',
-        'sInfo.monthsOfCommercialExp',
-      ])
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('hrProfile.userId = :userId ', { userId: user.id })
-      .getMany();
   }
 
   async getFilteredStudents(filteringOptions: FilteringOptionsDto) {
@@ -293,26 +261,6 @@ export class StudentService {
     }
 
     return studentProfile;
-  }
-
-  async verificationStudentBookingTime() {
-    const reservedStudents = await this.dataSource
-      .createQueryBuilder()
-      .select(['student'])
-      .from(StudentProfile, 'student')
-      .where('student.status = :reserved ', {
-        reserved: StudentStatus.RESERVED,
-      })
-      .getMany();
-    if (reservedStudents.length === 0) return;
-    for (const student of reservedStudents) {
-      if (isReservationValid(student.bookingDateTo)) {
-        student.status = StudentStatus.AVAILABLE;
-        student.bookingDateTo = null;
-        student.hrProfile = null;
-        await student.save();
-      }
-    }
   }
 
   async studentProfileUpdate(
