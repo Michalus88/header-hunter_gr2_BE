@@ -6,6 +6,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import {
   AvailableStudentRes,
@@ -28,12 +29,15 @@ import { FilteringOptionsDto } from './dto/filtering-options.dto';
 import { filteringQueryBuilder } from '../utils/filtering-query-builder';
 import { AuthService } from '../auth/auth.service';
 import { pagination } from 'src/utils/pagination';
+import { MailService } from '../mail/mail.service';
+import { HrProfile } from '../hr/hr-profile.entity';
 
 @Injectable()
 export class StudentService {
   constructor(
     private dataSource: DataSource,
     @Inject(forwardRef(() => AuthService)) private authService: AuthService,
+    @Inject(forwardRef(() => MailService)) private mailService: MailService,
   ) {}
 
   async activateProfile(
@@ -135,6 +139,70 @@ export class StudentService {
       lastName,
       email: user.email,
     };
+  }
+
+  async markAsHired(user: User, res: Response, studentId?: string) {
+    if (user.role === Role.STUDENT) {
+      const student = await this.dataSource
+        .createQueryBuilder()
+        .select('student')
+        .from(StudentProfile, 'student')
+        .leftJoin('student.user', 'user')
+        .where(
+          'student.userId = :userId And user.isActive = true And NOT student.status = :hired',
+          {
+            userId: user.id,
+            hired: StudentStatus.HIRED,
+          },
+        )
+        .getOne();
+      if (!student) {
+        throw new BadRequestException('Student do not exist.');
+      }
+      student.status = StudentStatus.HIRED;
+      await student.save();
+
+      return this.authService.logout(res, {
+        statusCode: 200,
+        message: 'You mark as hired and lost access to the application.',
+      });
+    } else {
+      const student = await this.dataSource
+        .createQueryBuilder()
+        .select(['student', 'sInfo.firstName', 'sInfo.lastName', 'user.email'])
+        .from(StudentProfile, 'student')
+        .leftJoin('student.studentInfo', 'sInfo')
+        .leftJoin('student.user', 'user')
+        .where(
+          'student.id = :studentId And user.isActive = true And NOT student.status = :hired',
+          {
+            studentId,
+            hired: StudentStatus.HIRED,
+          },
+        )
+        .getOne();
+      if (!student) {
+        throw new BadRequestException('Student do not exist.');
+      }
+      student.status = StudentStatus.HIRED;
+      await student.save();
+      const { studentInfo, user: userStudent } = student;
+      const hr = await this.dataSource
+        .createQueryBuilder()
+        .select(['hr.firstName', 'hr.lastName', 'hr.company'])
+        .from(HrProfile, 'hr')
+        .where('hr.userId = :userId', { userId: user.id })
+        .getOne();
+      await this.mailService.employmentNotification(
+        userStudent.email,
+        studentInfo.firstName,
+        studentInfo.lastName,
+        user.email,
+        hr.firstName,
+        hr.lastName,
+        hr.company,
+      );
+    }
   }
 
   async getAllAvailable(
