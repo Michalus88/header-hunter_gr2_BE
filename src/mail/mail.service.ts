@@ -47,4 +47,35 @@ export class MailService {
       message: 'Activation successful! Check your email.',
     };
   }
+
+  async employmentNotification(
+    email: string,
+    firstName: string,
+    lastName: string,
+    hrEmail: string,
+    hrFirstName: string,
+    hrLastName: string,
+    company: string,
+  ) {
+    const mail = {
+      to: 'michalus88@gmail.com',
+      subject: 'Employment notification',
+      from: 'headerhuntergr2@gmail.com',
+      template: 'employment-notification',
+      context: {
+        email,
+        firstName,
+        lastName,
+        hrEmail,
+        hrFirstName,
+        hrLastName,
+        company,
+      },
+    };
+    await this.mailerService.sendMail(mail);
+    return {
+      statusCode: 200,
+      message: `Student hired successful.`,
+    };
+  }
 }
