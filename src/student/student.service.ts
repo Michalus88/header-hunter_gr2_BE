@@ -6,14 +6,13 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import {
   AvailableStudentRes,
   ImportedStudentData,
-  StudentStatus,
   LoggedUserRes,
   Role,
+  StudentStatus,
 } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
@@ -205,19 +204,53 @@ export class StudentService {
     return this.getAllAvailable(filterQuery, parameters);
   }
 
-  async getDetailedStudent(user: User, studentId: string) {
-    return this.dataSource
-      .createQueryBuilder()
-      .select(['student', 'sInfo', 'user.email'])
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('hrProfile.userId = :userId AND student.id = :studentId', {
-        userId: user.id,
-        studentId,
-      })
-      .getOne();
+  async getDetailedStudent(user: User, studentId?: string) {
+    let email: string;
+    let id: string;
+    switch (user.role) {
+      case Role.STUDENT:
+        const data = await this.dataSource
+          .createQueryBuilder()
+          .select(['student.id'])
+          .from(StudentProfile, 'student')
+          .leftJoin('student.user', 'user')
+          .where('student.userId = :userId And user.isActive = true', {
+            userId: user.id,
+          })
+          .getOne();
+        if (!data) {
+          throw new BadRequestException(
+            'Student do not exist or you have not access.',
+          );
+        }
+        email = user.email;
+        id = data.id;
+        break;
+      case Role.HR || Role.ADMIN:
+        const userData = await this.dataSource
+          .createQueryBuilder()
+          .select(['user.email', 'student.id'])
+          .from(StudentProfile, 'student')
+          .leftJoin('student.user', 'user')
+          .where('student.id = :studentId And user.isActive = true', {
+            studentId,
+          })
+          .getOne();
+        if (!userData) {
+          throw new BadRequestException('Student do not exist.');
+        }
+        email = userData.user.email;
+        id = studentId;
+        break;
+      default:
+        throw new BadRequestException('Wrong user role.');
+    }
+    const detailedStudent = await StudentProfile.findOne({
+      relations: ['studentInfo', 'bonusProjectUrls'],
+      where: { id },
+    });
+
+    return { email, ...detailedStudent };
   }
 
   async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
@@ -262,78 +295,85 @@ export class StudentService {
   async studentProfileUpdate(
     user: User,
     studentProfileUpdateDto: StudentProfileUpdateDto,
-    studentId: string,
-    res: Response,
   ) {
-    const { studentInfo: sInfo } = await this.dataSource
+    const student = await this.dataSource
       .createQueryBuilder()
       .select(['student.id', 'sInfo.id'])
       .from(StudentProfile, 'student')
       .leftJoin('student.studentInfo', 'sInfo')
-      .where('student.id = :studentId', {
-        studentId,
-      })
+      .leftJoin('student.user', 'user')
+      .where('student.userId = user.id')
       .getOne();
-    if (!sInfo) {
+    if (!student) {
       throw new BadRequestException('The student do not exist.');
     }
+    const { studentInfo: sInfo } = student;
     const studentInfo = await StudentInfo.findOneBy({ id: sInfo.id });
     if (!studentInfo) {
       throw new BadRequestException('The student is not activate.');
     }
-    const {
-      firstName,
-      lastName,
-      tel,
-      githubUsername,
-      bio,
-      expectedSalary,
-      expectedTypeWork,
-      targetWorkCity,
-      expectedContractType,
-      courses,
-      canTakeApprenticeship,
-      workExperience,
-      monthsOfCommercialExp,
-      education,
-      projectUrls,
-      portfolioUrls,
-    } = studentProfileUpdateDto;
+    try {
+      const {
+        firstName,
+        lastName,
+        tel,
+        githubUsername,
+        bio,
+        expectedSalary,
+        expectedTypeWork,
+        targetWorkCity,
+        expectedContractType,
+        courses,
+        canTakeApprenticeship,
+        workExperience,
+        monthsOfCommercialExp,
+        education,
+        projectUrls,
+        portfolioUrls,
+      } = studentProfileUpdateDto;
 
-    studentInfo.firstName = firstName ?? studentInfo.firstName;
-    studentInfo.lastName = lastName ?? studentInfo.lastName;
-    studentInfo.tel = tel ?? studentInfo.tel;
-    studentInfo.githubUsername = githubUsername ?? studentInfo.githubUsername;
-    studentInfo.bio = bio ?? studentInfo.bio;
-    studentInfo.expectedSalary = expectedSalary ?? studentInfo.expectedSalary;
-    studentInfo.expectedTypeWork =
-      expectedTypeWork ?? studentInfo.expectedTypeWork;
-    studentInfo.targetWorkCity = targetWorkCity ?? studentInfo.targetWorkCity;
-    studentInfo.expectedContractType =
-      expectedContractType ?? studentInfo.expectedContractType;
-    studentInfo.courses = courses ?? studentInfo.courses;
-    studentInfo.canTakeApprenticeship =
-      canTakeApprenticeship ?? studentInfo.canTakeApprenticeship;
-    studentInfo.workExperience = workExperience ?? studentInfo.workExperience;
-    studentInfo.monthsOfCommercialExp =
-      monthsOfCommercialExp ?? studentInfo.monthsOfCommercialExp;
-    studentInfo.education = education ?? studentInfo.education;
-    await studentInfo.save();
+      studentInfo.firstName = firstName ?? studentInfo.firstName;
+      studentInfo.lastName = lastName ?? studentInfo.lastName;
+      studentInfo.tel = tel ?? studentInfo.tel;
+      studentInfo.githubUsername = githubUsername ?? studentInfo.githubUsername;
+      studentInfo.bio = bio ?? studentInfo.bio;
+      studentInfo.expectedSalary = expectedSalary ?? studentInfo.expectedSalary;
+      studentInfo.expectedTypeWork =
+        expectedTypeWork ?? studentInfo.expectedTypeWork;
+      studentInfo.targetWorkCity = targetWorkCity ?? studentInfo.targetWorkCity;
+      studentInfo.expectedContractType =
+        expectedContractType ?? studentInfo.expectedContractType;
+      studentInfo.courses = courses ?? studentInfo.courses;
+      studentInfo.canTakeApprenticeship =
+        canTakeApprenticeship ?? studentInfo.canTakeApprenticeship;
+      studentInfo.workExperience = workExperience ?? studentInfo.workExperience;
+      studentInfo.monthsOfCommercialExp =
+        monthsOfCommercialExp ?? studentInfo.monthsOfCommercialExp;
+      studentInfo.education = education ?? studentInfo.education;
+      await studentInfo.save();
 
-    if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
-      await this.removeUrls(studentInfo.portfolioUrls);
-      await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-    } else if (portfolioUrls?.length) {
-      await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-    }
-    if (projectUrls.length > 0) {
-      await this.removeUrls(studentInfo.projectUrls);
-      await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
+      if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
+        await this.removeUrls(studentInfo.portfolioUrls);
+        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
+      } else if (portfolioUrls?.length) {
+        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
+      }
+      if (projectUrls.length > 0) {
+        await this.removeUrls(studentInfo.projectUrls);
+        await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
 
-      return res.json({
-        statusCode: 200,
-        message: 'Success.',
-      });
+        return {
+          statusCode: 200,
+          message: 'Success.',
+        };
+      }
+    } catch (err) {
+      if (err.errno && err.errno === 1062) {
+        throw new BadRequestException(
+          'Sorry. Student with the given gitHub name is register.',
+        );
+      }
+      throw new InternalServerErrorException();
     }
   }
 

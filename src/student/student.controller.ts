@@ -28,17 +28,10 @@ export class StudentController {
   @Put('/:studentId')
   @UseGuards(JwtAuthGuard, IsStudent)
   @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
-  studentProfileUpdate(
-    @UserObj() user: User,
-    @Body() studentProfileUpdateDto,
-    @Param('studentId') studentId: string,
-    @Res() res: Response,
-  ) {
+  studentProfileUpdate(@UserObj() user: User, @Body() studentProfileUpdateDto) {
     return this.studentService.studentProfileUpdate(
       user,
       studentProfileUpdateDto,
-      studentId,
-      res,
     );
   }
 
@@ -52,6 +45,12 @@ export class StudentController {
       maxPerPage,
       currentPage,
     );
+  }
+
+  @Get('/detailed')
+  @UseGuards(JwtAuthGuard, IsStudent)
+  getDetailedStudent(@UserObj() user: User) {
+    return this.studentService.getDetailedStudent(user);
   }
 
   @UseGuards(JwtAuthGuard, IsHr)
