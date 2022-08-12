@@ -236,7 +236,10 @@ export class StudentService {
       .from(StudentProfile, 'student')
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
-      .where(`user.isActive = true ${filterQuery ?? ''}`, parameters)
+      .where(
+        `user.isActive = true NOT student.status = :hired ${filterQuery ?? ''}`,
+        parameters,
+      )
       .getMany()) as unknown as AvailableStudentRes[];
   }
 
