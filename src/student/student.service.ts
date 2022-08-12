@@ -6,14 +6,13 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
 import {
   AvailableStudentRes,
   ImportedStudentData,
-  StudentStatus,
   LoggedUserRes,
   Role,
+  StudentStatus,
 } from 'types';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { StudentProfile } from './student-profile.entity';
@@ -205,19 +204,53 @@ export class StudentService {
     return this.getAllAvailable(filterQuery, parameters);
   }
 
-  async getDetailedStudent(user: User, studentId: string) {
-    return this.dataSource
-      .createQueryBuilder()
-      .select(['student', 'sInfo', 'user.email'])
-      .from(StudentProfile, 'student')
-      .leftJoin('student.user', 'user')
-      .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.hrProfile', 'hrProfile')
-      .where('hrProfile.userId = :userId AND student.id = :studentId', {
-        userId: user.id,
-        studentId,
-      })
-      .getOne();
+  async getDetailedStudent(user: User, studentId?: string) {
+    let email: string;
+    let id: string;
+    switch (user.role) {
+      case Role.STUDENT:
+        const data = await this.dataSource
+          .createQueryBuilder()
+          .select(['student.id'])
+          .from(StudentProfile, 'student')
+          .leftJoin('student.user', 'user')
+          .where('student.userId = :userId And user.isActive = true', {
+            userId: user.id,
+          })
+          .getOne();
+        if (!data) {
+          throw new BadRequestException(
+            'Student do not exist or you have not access.',
+          );
+        }
+        email = user.email;
+        id = data.id;
+        break;
+      case Role.HR || Role.ADMIN:
+        const userData = await this.dataSource
+          .createQueryBuilder()
+          .select(['user.email', 'student.id'])
+          .from(StudentProfile, 'student')
+          .leftJoin('student.user', 'user')
+          .where('student.id = :studentId And user.isActive = true', {
+            studentId,
+          })
+          .getOne();
+        if (!userData) {
+          throw new BadRequestException('Student do not exist.');
+        }
+        email = userData.user.email;
+        id = studentId;
+        break;
+      default:
+        throw new BadRequestException('Wrong user role.');
+    }
+    const detailedStudent = await StudentProfile.findOne({
+      relations: ['studentInfo', 'bonusProjectUrls'],
+      where: { id },
+    });
+
+    return { email, ...detailedStudent };
   }
 
   async saveDataFromCsvToDb(student: ImportedStudentData, user: User) {
