@@ -5,11 +5,9 @@ import {
   Param,
   Post,
   Put,
-  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { StudentService } from './student.service';
 import { StudentProfileActivationDto } from './dto/profile-register.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';

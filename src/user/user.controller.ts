@@ -23,6 +23,7 @@ import { IsAdmin } from '../guards/is-admin';
 import { PasswordChangeDto } from './dto/password-change.dto';
 import { UserObj } from '../decorators/user-object.decorator';
 import { User } from './user.entity';
+import { EmailChangeDto } from './dto/email-change.dto';
 
 @Controller('api/user')
 export class UserController {
@@ -67,6 +68,12 @@ export class UserController {
       req.importStudents,
       req.incorrectData,
     );
+  }
+
+  @Patch('/email')
+  @UseGuards(JwtAuthGuard)
+  emailChange(@Body() emailChangeDto: EmailChangeDto, @UserObj() user: User) {
+    return this.userService.emailChange(emailChangeDto, user);
   }
 
   @Patch('/password')

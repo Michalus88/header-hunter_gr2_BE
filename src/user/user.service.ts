@@ -23,6 +23,7 @@ import { HrRegisterDto } from '../hr/dto/hrRegister.dto';
 import { PasswordChangeDto } from './dto/password-change.dto';
 import { AuthService } from '../auth/auth.service';
 import { HrService } from '../hr/hr.service';
+import { EmailChangeDto } from './dto/email-change.dto';
 
 @Injectable()
 export class UserService {
@@ -136,6 +137,23 @@ export class UserService {
     }
 
     return sanitizeUser(user);
+  }
+
+  async emailChange(emailChangeDto: EmailChangeDto, user: User) {
+    const { oldEmail, newEmail, repeatNewEmail } = emailChangeDto;
+    if (user.email !== oldEmail) {
+      throw new BadRequestException('Wrong email.');
+    }
+    if (newEmail !== repeatNewEmail) {
+      throw new BadRequestException('Wrong repeat password.');
+    }
+    user.email = newEmail;
+    await user.save();
+
+    return {
+      statusCode: 200,
+      message: 'Success.Your mail has been changed.',
+    };
   }
 
   async passwordChange(passwordChangedDto: PasswordChangeDto, user: User) {
