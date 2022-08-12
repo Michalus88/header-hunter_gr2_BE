@@ -145,7 +145,7 @@ export class UserService {
       throw new BadRequestException('Wrong email.');
     }
     if (newEmail !== repeatNewEmail) {
-      throw new BadRequestException('Wrong repeat password.');
+      throw new BadRequestException('Wrong repeat email.');
     }
     user.email = newEmail;
     await user.save();
