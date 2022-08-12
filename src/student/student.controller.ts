@@ -47,6 +47,12 @@ export class StudentController {
     );
   }
 
+  @Get('/detailed')
+  @UseGuards(JwtAuthGuard, IsStudent)
+  getDetailedStudent(@UserObj() user: User) {
+    return this.studentService.getDetailedStudent(user);
+  }
+
   @UseGuards(JwtAuthGuard, IsHr)
   @Get('/filtered')
   getFilteredStudent(@Body() filteringOptions: FilteringOptions) {
