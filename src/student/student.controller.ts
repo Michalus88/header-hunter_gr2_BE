@@ -25,7 +25,7 @@ import { IsStudent } from '../guards/is-student';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  @Put('/:studentId')
+  @Put('/')
   @UseGuards(JwtAuthGuard, IsStudent)
   @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
   studentProfileUpdate(@UserObj() user: User, @Body() studentProfileUpdateDto) {
