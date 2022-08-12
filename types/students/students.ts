@@ -86,12 +86,12 @@ export interface AvailableStudentWhitPaginationRes {
   };
 }
 
-export interface DetailedStudentDataRes
-  extends ImportedStudentData,
-    StudentProfileRegister {
-  status: StudentStatus;
-  user: { email: string };
-}
+// export interface DetailedStudentDataRes
+//   extends ImportedStudentData,
+//     StudentProfileRegister {
+//   status: StudentStatus;
+//   user: { email: string };
+// }
 
 interface StudentInfo
   extends Omit<StudentProfileRegister, 'portfolioUrls' | 'projectUrls'> {
@@ -99,7 +99,7 @@ interface StudentInfo
   projectUrls: UrlEntity[];
 }
 
-export interface StudentStartDataRes
+export interface DetailedStudentDataRes
   extends Omit<ImportedStudentData, 'bonusProjectUrls'> {
   id: string;
   status: StudentStatus;
