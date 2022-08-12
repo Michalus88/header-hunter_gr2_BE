@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { HrService } from './hr.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UserObj } from '../decorators/user-object.decorator';
@@ -7,6 +15,8 @@ import { StudentService } from '../student/student.service';
 import { HrRegisterDto } from './dto/hrRegister.dto';
 import { FilteringOptions } from '../../types';
 import { IsHr } from '../guards/is-hr';
+import { IsStudent } from '../guards/is-student';
+import { Response } from 'express';
 
 @Controller('api/hr')
 export class HrController {
@@ -43,5 +53,15 @@ export class HrController {
   @UseGuards(JwtAuthGuard, IsHr)
   bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
     return this.hrService.bookingStudent(user, studentId);
+  }
+
+  @Patch('/hired/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
+  markAsHired(
+    @UserObj() user: User,
+    @Res() res: Response,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.studentService.markAsHired(user, res, studentId);
   }
 }

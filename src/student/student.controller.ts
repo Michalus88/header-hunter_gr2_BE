@@ -3,8 +3,10 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
+  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,6 +20,7 @@ import { EmailExistInDBValidate } from 'src/interceptors/email-exist-in-DB-valid
 import { UserObj } from '../decorators/user-object.decorator';
 import { User } from '../user/user.entity';
 import { IsStudent } from '../guards/is-student';
+import { Response } from 'express';
 
 @Controller('api/student')
 export class StudentController {
@@ -68,5 +71,11 @@ export class StudentController {
       userId,
       registerToken,
     );
+  }
+
+  @Patch('/hired')
+  @UseGuards(JwtAuthGuard, IsStudent)
+  markAsHired(@UserObj() user: User, @Res() res: Response) {
+    return this.studentService.markAsHired(user, res);
   }
 }
