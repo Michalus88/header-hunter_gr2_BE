@@ -1,7 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, Max, Min } from 'class-validator';
 import { HrProfileRegister } from 'types';
 
 export class HrRegisterDto implements HrProfileRegister {
+  @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
   email: string;
