@@ -27,7 +27,7 @@ export enum ExpectedContractType {
   COMMISSION_CONTRACT_OR_SPECIFIC_TASK_CONTRACT,
 }
 
-interface UrlEntity {
+export interface UrlEntity {
   id: string;
   url: string;
 }
@@ -74,6 +74,17 @@ export interface AvailableStudentRes
 
 export interface ReservedStudentRes extends AvailableStudentRes {
   bookingDateTo: Date;
+}
+
+export interface ReservedStudentResWithPaginationRes
+  extends ReservedStudentRes {
+  bookingDateTo: Date;
+  pages: {
+    maxPerPage: number;
+    currentPage: number;
+    studentsCount: number;
+    totalPages: number;
+  };
 }
 
 export interface AvailableStudentWhitPaginationRes {
