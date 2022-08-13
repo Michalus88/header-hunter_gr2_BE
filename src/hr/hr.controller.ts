@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -12,10 +13,8 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UserObj } from '../decorators/user-object.decorator';
 import { User } from '../user/user.entity';
 import { StudentService } from '../student/student.service';
-import { HrRegisterDto } from './dto/hrRegister.dto';
 import { FilteringOptions } from '../../types';
 import { IsHr } from '../guards/is-hr';
-import { IsStudent } from '../guards/is-student';
 import { Response } from 'express';
 
 @Controller('api/hr')
@@ -31,13 +30,10 @@ export class HrController {
     return this.hrService.getMe(user);
   }
 
-  @Get('/booked-students/filtered')
+  @Get('/booked-students')
   @UseGuards(JwtAuthGuard, IsHr)
-  getBookedFilteredStudent(
-    @UserObj() user: User,
-    @Body() filteringOptions: FilteringOptions,
-  ) {
-    return this.hrService.getFilteredBookingStudents(user, filteringOptions);
+  getBookedStudents(@UserObj() user: User) {
+    return this.hrService.getBookedStudents(user);
   }
 
   @Get('/booked-students/:studentId')
@@ -49,10 +45,13 @@ export class HrController {
     return this.studentService.getDetailedStudent(user, studentId);
   }
 
-  @Get('/booked-students')
+  @Post('/booked-students/filtered')
   @UseGuards(JwtAuthGuard, IsHr)
-  getBookedStudents(@UserObj() user: User) {
-    return this.hrService.getBookedStudents(user);
+  getBookedFilteredStudent(
+    @UserObj() user: User,
+    @Body() filteringOptions: FilteringOptions,
+  ) {
+    return this.hrService.getFilteredBookingStudents(user, filteringOptions);
   }
 
   @Patch('/booking-student/:studentId')

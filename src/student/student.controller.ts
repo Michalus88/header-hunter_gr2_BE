@@ -26,16 +26,6 @@ import { Response } from 'express';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  @Put('/')
-  @UseGuards(JwtAuthGuard, IsStudent)
-  @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
-  studentProfileUpdate(@UserObj() user: User, @Body() studentProfileUpdateDto) {
-    return this.studentService.studentProfileUpdate(
-      user,
-      studentProfileUpdateDto,
-    );
-  }
-
   @Get('/available/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
   getAllAvailableWhitPagination(
@@ -54,8 +44,8 @@ export class StudentController {
     return this.studentService.getDetailedStudent(user);
   }
 
+  @Post('/filtered')
   @UseGuards(JwtAuthGuard, IsHr)
-  @Get('/filtered')
   getFilteredStudent(@Body() filteringOptions: FilteringOptions) {
     return this.studentService.getFilteredStudents(filteringOptions);
   }
@@ -70,6 +60,16 @@ export class StudentController {
       studentProfileActivation,
       userId,
       registerToken,
+    );
+  }
+
+  @Put('/')
+  @UseGuards(JwtAuthGuard, IsStudent)
+  @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
+  studentProfileUpdate(@UserObj() user: User, @Body() studentProfileUpdateDto) {
+    return this.studentService.studentProfileUpdate(
+      user,
+      studentProfileUpdateDto,
     );
   }
 
