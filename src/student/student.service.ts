@@ -215,10 +215,9 @@ export class StudentService {
     const parameters = filterParameters
       ? {
           ...filterParameters,
-          available: StudentStatus.AVAILABLE,
           hired: StudentStatus.HIRED,
         }
-      : { available: StudentStatus.AVAILABLE, hired: StudentStatus.HIRED };
+      : { hired: StudentStatus.HIRED };
     return (await this.dataSource
       .createQueryBuilder()
       .select([
