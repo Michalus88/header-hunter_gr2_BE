@@ -51,10 +51,7 @@ export class HrController {
 
   @Get('/booked-students')
   @UseGuards(JwtAuthGuard, IsHr)
-  getBookedStudents(
-    @UserObj() user: User,
-    @Param('studentId') studentId: string,
-  ) {
+  getBookedStudents(@UserObj() user: User) {
     return this.hrService.getBookedStudents(user);
   }
 
