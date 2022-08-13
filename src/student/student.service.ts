@@ -213,8 +213,12 @@ export class StudentService {
     >,
   ) {
     const parameters = filterParameters
-      ? { ...filterParameters, available: StudentStatus.AVAILABLE }
-      : { available: StudentStatus.AVAILABLE };
+      ? {
+          ...filterParameters,
+          available: StudentStatus.AVAILABLE,
+          hired: StudentStatus.HIRED,
+        }
+      : { available: StudentStatus.AVAILABLE, hired: StudentStatus.HIRED };
     return (await this.dataSource
       .createQueryBuilder()
       .select([
@@ -237,7 +241,9 @@ export class StudentService {
       .leftJoin('student.user', 'user')
       .leftJoin('student.studentInfo', 'sInfo')
       .where(
-        `user.isActive = true NOT student.status = :hired ${filterQuery ?? ''}`,
+        `user.isActive = true AND NOT student.status = :hired ${
+          filterQuery ?? ''
+        }`,
         parameters,
       )
       .getMany()) as unknown as AvailableStudentRes[];
