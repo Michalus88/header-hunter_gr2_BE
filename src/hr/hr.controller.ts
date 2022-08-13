@@ -31,6 +31,15 @@ export class HrController {
     return this.hrService.getMe(user);
   }
 
+  @Get('/booked-students/filtered')
+  @UseGuards(JwtAuthGuard, IsHr)
+  getBookedFilteredStudent(
+    @UserObj() user: User,
+    @Body() filteringOptions: FilteringOptions,
+  ) {
+    return this.hrService.getFilteredBookingStudents(user, filteringOptions);
+  }
+
   @Get('/booked-students/:studentId')
   @UseGuards(JwtAuthGuard, IsHr)
   getDetailedStudent(

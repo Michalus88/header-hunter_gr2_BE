@@ -5,6 +5,8 @@ import { DataSource } from 'typeorm';
 import { setMaxReservationTime } from '../utils/set-max-reservation-time';
 import { StudentProfile } from '../student/student-profile.entity';
 import { isReservationValid } from '../utils/is-reservation-valid';
+import { FilteringOptionsDto } from '../student/dto/filtering-options.dto';
+import { StudentStatus } from '../../types';
 
 @Injectable()
 export class ReservationService {
@@ -44,7 +46,17 @@ export class ReservationService {
     }
   }
 
-  async getBookedStudents(hr: HrProfile) {
+  async getBookedStudents(
+    hrId: string,
+    query?: string,
+    filterParameters?: Omit<
+      FilteringOptionsDto,
+      'expectedSalaryFrom' | 'expectedSalaryTo'
+    >,
+  ) {
+    const parameters = filterParameters
+      ? { ...filterParameters, hrId, hired: StudentStatus.HIRED }
+      : { hrId, hired: StudentStatus.HIRED };
     const reservations = await this.dataSource
       .createQueryBuilder()
       .select([
@@ -67,7 +79,12 @@ export class ReservationService {
       .leftJoin('reservation.studentProfile', 'student')
       .leftJoin('reservation.hrProfile', 'hrProfile')
       .leftJoin('student.studentInfo', 'sInfo')
-      .where('reservation.hrProfile = :hrId ', { hrId: hr.id })
+      .where(
+        `reservation.hrProfile = :hrId AND NOT student.status = :hired ${
+          query ?? ''
+        } `,
+        parameters,
+      )
       .getMany();
 
     return reservations.map((reservation) => ({
