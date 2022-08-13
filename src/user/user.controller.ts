@@ -35,14 +35,6 @@ export class UserController {
     return this.userService.getMe(user);
   }
 
-  @Patch('/activate/:userId/:registerToken')
-  accountActivation(
-    @Param('userId') userId: string,
-    @Param('registerToken') registerToken: string,
-  ) {
-    return this.userService.accountActivation(userId, registerToken);
-  }
-
   @Post('/hr')
   @UseGuards(JwtAuthGuard, IsAdmin)
   hrRegister(@Body() hrRegisterDto: HrRegisterDto) {
@@ -68,6 +60,14 @@ export class UserController {
       req.importStudents,
       req.incorrectData,
     );
+  }
+
+  @Patch('/activate/:userId/:registerToken')
+  accountActivation(
+    @Param('userId') userId: string,
+    @Param('registerToken') registerToken: string,
+  ) {
+    return this.userService.accountActivation(userId, registerToken);
   }
 
   @Patch('/email')
