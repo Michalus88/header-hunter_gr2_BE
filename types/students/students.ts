@@ -76,8 +76,7 @@ export interface ReservedStudentRes extends AvailableStudentRes {
   bookingDateTo: Date;
 }
 
-export interface ReservedStudentResWithPaginationRes
-  extends ReservedStudentRes {
+export interface ReservedStudentsWithPaginationRes extends ReservedStudentRes {
   bookingDateTo: Date;
   pages: {
     maxPerPage: number;
@@ -87,7 +86,7 @@ export interface ReservedStudentResWithPaginationRes
   };
 }
 
-export interface AvailableStudentWhitPaginationRes {
+export interface AvailableStudentsWithtPaginationRes {
   students: AvailableStudentRes[];
   pages: {
     maxPerPage: number;
