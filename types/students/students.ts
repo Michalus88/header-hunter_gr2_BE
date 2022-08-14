@@ -18,7 +18,6 @@ export enum ExpectedTypeWork {
   READY_TO_MOVE,
   REMOTE,
   HYBRID,
-  IRRELEVANT,
 }
 
 export enum ExpectedContractType {
@@ -40,9 +39,9 @@ export interface StudentProfileRegister {
   portfolioUrls: string[] | [];
   projectUrls: string[];
   bio: string | undefined;
-  expectedTypeWork: ExpectedTypeWork;
+  expectedTypeWork: ExpectedTypeWork | null;
   targetWorkCity: string | undefined;
-  expectedContractType: ExpectedContractType;
+  expectedContractType: ExpectedContractType | null;
   expectedSalary: string | undefined;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
@@ -126,7 +125,7 @@ export interface FilteringOptions {
   expectedContractType: ExpectedContractType | null;
   expectedSalaryFrom: number | null;
   expectedSalaryTo: number | null;
-  expectedTypeWork: ExpectedTypeWork;
+  expectedTypeWork: ExpectedTypeWork | null;
   canTakeApprenticeship: boolean | null;
   monthsOfCommercialExp: number | null;
 }
