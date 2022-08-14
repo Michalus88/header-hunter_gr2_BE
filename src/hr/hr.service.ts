@@ -1,16 +1,13 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '../user/user.entity';
 import { HrProfile } from './hr-profile.entity';
-import { FilteringOptions, LoggedUserRes, StudentStatus } from '../../types';
+import { LoggedUserRes, ReservedStudentRes } from '../../types';
 import { DataSource } from 'typeorm';
 import { StudentService } from '../student/student.service';
 import { ReservationService } from '../reservation/reservation.service';
 import { FilteringOptionsDto } from '../student/dto/filtering-options.dto';
 import { filteringQueryBuilder } from '../utils/filtering-query-builder';
+import { pagination } from '../utils/pagination';
 
 @Injectable()
 export class HrService {
@@ -42,16 +39,19 @@ export class HrService {
     };
   }
 
-  async getBookedStudents(user: User, filteringOptions?: FilteringOptions) {
+  async getBookedStudents(user: User, maxPerPage: number, currentPage: number) {
     await this.reservationService.verificationStudentBookingTime();
     const hr = await this.extractedHrFieldsFromUser(user, ['hr.id']);
     const { id } = hr;
-    return this.reservationService.getBookedStudents(id);
+    const bookedStudents = await this.reservationService.getBookedStudents(id);
+    return pagination(bookedStudents, maxPerPage, currentPage);
   }
 
   async getFilteredBookingStudents(
     user: User,
     filteringOptions: FilteringOptionsDto,
+    maxPerPage: number,
+    currentPage: number,
   ) {
     const hr = await this.extractedHrFieldsFromUser(user, ['hr.id']);
     const { id } = hr;
@@ -75,7 +75,13 @@ export class HrService {
     };
     const query = filteringQueryBuilder(filteringOptions);
 
-    return this.reservationService.getBookedStudents(id, query, parameters);
+    const bookingStudents = await this.reservationService.getBookedStudents(
+      id,
+      query,
+      parameters,
+    );
+
+    return pagination(bookingStudents, maxPerPage, currentPage);
   }
 
   async extractedHrFieldsFromUser(user: User, extractedFields: string[] = []) {

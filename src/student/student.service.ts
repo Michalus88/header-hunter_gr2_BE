@@ -206,6 +206,8 @@ export class StudentService {
   }
 
   async getAllAvailable(
+    maxPerPage: number,
+    currentPage: number,
     filterQuery?: string,
     filterParameters?: Omit<
       FilteringOptionsDto,
@@ -218,7 +220,7 @@ export class StudentService {
           hired: StudentStatus.HIRED,
         }
       : { hired: StudentStatus.HIRED };
-    return (await this.dataSource
+    const allAvailable = (await this.dataSource
       .createQueryBuilder()
       .select([
         'student.id',
@@ -246,17 +248,22 @@ export class StudentService {
         parameters,
       )
       .getMany()) as unknown as AvailableStudentRes[];
-  }
-
-  async getAllAvailableWhitPagination(
-    maxPerPage?: number,
-    currentPage?: number,
-  ) {
-    const allAvailable = await this.getAllAvailable();
     return pagination(allAvailable, Number(maxPerPage), Number(currentPage));
   }
 
-  async getFilteredStudents(filteringOptions: FilteringOptionsDto) {
+  // async getAllAvailableWhitPagination(
+  //   maxPerPage?: number,
+  //   currentPage?: number,
+  // ) {
+  //   const allAvailable = await this.getAllAvailable();
+  //   return pagination(allAvailable, Number(maxPerPage), Number(currentPage));
+  // }
+
+  async getFilteredStudents(
+    filteringOptions: FilteringOptionsDto,
+    maxPerPage: number,
+    currentPage: number,
+  ) {
     const {
       expectedContractType,
       teamProjectDegree,
@@ -276,8 +283,12 @@ export class StudentService {
       projectDegree,
     };
     const filterQuery = filteringQueryBuilder(filteringOptions);
-
-    return this.getAllAvailable(filterQuery, parameters);
+    return await this.getAllAvailable(
+      maxPerPage,
+      currentPage,
+      filterQuery,
+      parameters,
+    );
   }
 
   async getDetailedStudent(user: User, studentId?: string) {

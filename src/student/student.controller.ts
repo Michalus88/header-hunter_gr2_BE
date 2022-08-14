@@ -32,10 +32,7 @@ export class StudentController {
     @Param('maxPerPage') maxPerPage: number,
     @Param('currentPage') currentPage: number,
   ) {
-    return this.studentService.getAllAvailableWhitPagination(
-      maxPerPage,
-      currentPage,
-    );
+    return this.studentService.getAllAvailable(maxPerPage, currentPage);
   }
 
   @Get('/detailed')
@@ -44,10 +41,18 @@ export class StudentController {
     return this.studentService.getDetailedStudent(user);
   }
 
-  @Post('/filtered')
+  @Post('/filtered/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
-  getFilteredStudent(@Body() filteringOptions: FilteringOptions) {
-    return this.studentService.getFilteredStudents(filteringOptions);
+  getFilteredStudent(
+    @Body() filteringOptions: FilteringOptions,
+    @Param('maxPerPage') maxPerPage: number,
+    @Param('currentPage') currentPage: number,
+  ) {
+    return this.studentService.getFilteredStudents(
+      filteringOptions,
+      maxPerPage,
+      currentPage,
+    );
   }
 
   @Post('/activate/:userId/:registerToken')

@@ -6,7 +6,7 @@ import { setMaxReservationTime } from '../utils/set-max-reservation-time';
 import { StudentProfile } from '../student/student-profile.entity';
 import { isReservationValid } from '../utils/is-reservation-valid';
 import { FilteringOptionsDto } from '../student/dto/filtering-options.dto';
-import { StudentStatus } from '../../types';
+import { ReservedStudentRes, StudentStatus } from '../../types';
 
 @Injectable()
 export class ReservationService {
@@ -53,7 +53,7 @@ export class ReservationService {
       FilteringOptionsDto,
       'expectedSalaryFrom' | 'expectedSalaryTo'
     >,
-  ) {
+  ): Promise<ReservedStudentRes[]> {
     const parameters = filterParameters
       ? { ...filterParameters, hrId, hired: StudentStatus.HIRED }
       : { hrId, hired: StudentStatus.HIRED };
