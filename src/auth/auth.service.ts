@@ -51,6 +51,7 @@ export class AuthService {
         throw new BadRequestException('You are hired and you lost access.');
       }
     }
+    const userRes = await this.userService.getMe(user);
     return res
       .cookie('jwt', token, {
         secure: false,
@@ -58,7 +59,7 @@ export class AuthService {
         httpOnly: stringToBoolean(process.env.COOKIE_SECURE),
         maxAge: oneDay,
       })
-      .json(sanitizeUser(user));
+      .json(userRes);
   }
 
   logout(res: Response, responseObj?: { statusCode: number; message: string }) {
