@@ -126,6 +126,7 @@ export interface FilteringOptions {
   expectedContractType: ExpectedContractType | null;
   expectedSalaryFrom: number | null;
   expectedSalaryTo: number | null;
+  expectedTypeWork: ExpectedTypeWork;
   canTakeApprenticeship: boolean | null;
   monthsOfCommercialExp: number | null;
 }
