@@ -26,26 +26,13 @@ import { Response } from 'express';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  @Put('/')
-  @UseGuards(JwtAuthGuard, IsStudent)
-  @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
-  studentProfileUpdate(@UserObj() user: User, @Body() studentProfileUpdateDto) {
-    return this.studentService.studentProfileUpdate(
-      user,
-      studentProfileUpdateDto,
-    );
-  }
-
   @Get('/available/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
   getAllAvailableWhitPagination(
     @Param('maxPerPage') maxPerPage: number,
     @Param('currentPage') currentPage: number,
   ) {
-    return this.studentService.getAllAvailableWhitPagination(
-      maxPerPage,
-      currentPage,
-    );
+    return this.studentService.getAllAvailable(maxPerPage, currentPage);
   }
 
   @Get('/detailed')
@@ -54,10 +41,18 @@ export class StudentController {
     return this.studentService.getDetailedStudent(user);
   }
 
+  @Post('/filtered/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
-  @Get('/filtered')
-  getFilteredStudent(@Body() filteringOptions: FilteringOptions) {
-    return this.studentService.getFilteredStudents(filteringOptions);
+  getFilteredStudent(
+    @Body() filteringOptions: FilteringOptions,
+    @Param('maxPerPage') maxPerPage: number,
+    @Param('currentPage') currentPage: number,
+  ) {
+    return this.studentService.getFilteredStudents(
+      filteringOptions,
+      maxPerPage,
+      currentPage,
+    );
   }
 
   @Post('/activate/:userId/:registerToken')
@@ -70,6 +65,16 @@ export class StudentController {
       studentProfileActivation,
       userId,
       registerToken,
+    );
+  }
+
+  @Put('/')
+  @UseGuards(JwtAuthGuard, IsStudent)
+  @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
+  studentProfileUpdate(@UserObj() user: User, @Body() studentProfileUpdateDto) {
+    return this.studentService.studentProfileUpdate(
+      user,
+      studentProfileUpdateDto,
     );
   }
 

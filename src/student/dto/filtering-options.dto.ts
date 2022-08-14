@@ -1,5 +1,9 @@
 import { IsNotEmpty, IsPositive } from 'class-validator';
-import { ExpectedContractType, FilteringOptions } from 'types';
+import {
+  ExpectedContractType,
+  ExpectedTypeWork,
+  FilteringOptions,
+} from 'types';
 
 export class FilteringOptionsDto implements FilteringOptions {
   @IsNotEmpty()
@@ -16,6 +20,10 @@ export class FilteringOptionsDto implements FilteringOptions {
 
   @IsNotEmpty()
   expectedContractType: ExpectedContractType | null;
+
+  @IsNotEmpty()
+  @IsPositive()
+  expectedTypeWork: ExpectedTypeWork | null;
 
   @IsNotEmpty()
   @IsPositive()
