@@ -17,7 +17,8 @@ export const filteringQueryBuilder = (
       } else if (
         key === 'expectedContractType' ||
         key === 'canTakeApprenticeship' ||
-        key === 'monthsOfCommercialExp'
+        key === 'monthsOfCommercialExp' ||
+        key === 'expectedTypeWork'
       ) {
         query += ` AND sInfo.${key} = :${key}`;
       } else {

@@ -57,6 +57,7 @@ export class HrService {
     const { id } = hr;
     const {
       expectedContractType,
+      expectedTypeWork,
       teamProjectDegree,
       canTakeApprenticeship,
       courseEngagement,
@@ -66,6 +67,7 @@ export class HrService {
     } = filteringOptions;
     const parameters = {
       expectedContractType,
+      expectedTypeWork,
       teamProjectDegree,
       canTakeApprenticeship,
       courseEngagement,

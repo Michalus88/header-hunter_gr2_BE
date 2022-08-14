@@ -266,6 +266,7 @@ export class StudentService {
   ) {
     const {
       expectedContractType,
+      expectedTypeWork,
       teamProjectDegree,
       canTakeApprenticeship,
       courseEngagement,
@@ -275,6 +276,7 @@ export class StudentService {
     } = filteringOptions;
     const parameters = {
       expectedContractType,
+      expectedTypeWork,
       teamProjectDegree,
       canTakeApprenticeship,
       courseEngagement,
