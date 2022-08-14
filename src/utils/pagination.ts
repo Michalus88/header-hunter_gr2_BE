@@ -1,10 +1,15 @@
-import { AvailableStudentRes, AvailableStudentWhitPaginationRes } from 'types';
+import {
+  AvailableStudentRes,
+  AvailableStudentsWithtPaginationRes,
+  ReservedStudentRes,
+  ReservedStudentsWithPaginationRes,
+} from 'types';
 
 export const pagination = (
-  arr: AvailableStudentRes[],
+  arr: AvailableStudentRes[] | ReservedStudentRes[],
   maxPerPage = 5,
   currentPage = 1,
-): AvailableStudentWhitPaginationRes => {
+): AvailableStudentsWithtPaginationRes | ReservedStudentsWithPaginationRes => {
   const studentsCount = arr.length;
   const totalPages = Math.ceil(studentsCount / maxPerPage);
   const paginationArr = arr.slice(
