@@ -68,6 +68,7 @@ export interface AvailableStudentRes
     | 'canTakeApprenticeship'
     | 'workExperience'
     | 'monthsOfCommercialExp'
+    | 'githubUsername'
   >;
 }
 
@@ -76,7 +77,8 @@ export interface ReservedStudentRes extends AvailableStudentRes {
 }
 
 export interface ReservedStudentsWithPaginationRes extends ReservedStudentRes {
-  bookingDateTo: Date;
+  students: ReservedStudentRes[];
+  // bookingDateTo: Date;
   pages: {
     maxPerPage: number;
     currentPage: number;
