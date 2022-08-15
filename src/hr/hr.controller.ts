@@ -30,6 +30,15 @@ export class HrController {
     return this.hrService.getMe(user);
   }
 
+  @Get('/booked-students/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
+  getDetailedStudent(
+    @UserObj() user: User,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.studentService.getDetailedStudent(user, studentId);
+  }
+
   @Get('/booked-students/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
   getBookedStudents(
@@ -38,15 +47,6 @@ export class HrController {
     @Param('currentPage') currentPage: number,
   ) {
     return this.hrService.getBookedStudents(user, maxPerPage, currentPage);
-  }
-
-  @Get('/booked-students/:studentId')
-  @UseGuards(JwtAuthGuard, IsHr)
-  getDetailedStudent(
-    @UserObj() user: User,
-    @Param('studentId') studentId: string,
-  ) {
-    return this.studentService.getDetailedStudent(user, studentId);
   }
 
   @Post('/booked-students/filtered/:maxPerPage?/:currentPage?')

@@ -74,6 +74,7 @@ export class ReservationService {
         'sInfo.expectedContractType',
         'sInfo.canTakeApprenticeship',
         'sInfo.monthsOfCommercialExp',
+        'sInfo.githubUsername',
       ])
       .from(Reservation, 'reservation')
       .leftJoin('reservation.studentProfile', 'student')
