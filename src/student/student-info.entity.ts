@@ -52,13 +52,23 @@ export class StudentInfo
   @Column({ nullable: true, length: 1000, default: null })
   bio: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({
+    nullable: true,
+    type: 'enum',
+    enum: ExpectedTypeWork,
+    default: null,
+  })
   expectedTypeWork: ExpectedTypeWork;
 
   @Column({ nullable: true, length: 30, default: null })
   targetWorkCity: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+    type: 'enum',
+    enum: ExpectedContractType,
+    default: null,
+  })
   expectedContractType: ExpectedContractType;
 
   @Column({ nullable: true, length: 5, default: null })
