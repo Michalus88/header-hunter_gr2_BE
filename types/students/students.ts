@@ -40,9 +40,9 @@ export interface StudentProfileRegister {
   portfolioUrls: string[] | [];
   projectUrls: string[];
   bio: string | undefined;
-  expectedTypeWork: ExpectedTypeWork;
+  expectedTypeWork: ExpectedTypeWork | undefined | null;
   targetWorkCity: string | undefined;
-  expectedContractType: ExpectedContractType;
+  expectedContractType: ExpectedContractType | undefined | null;
   expectedSalary: string | undefined;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
@@ -123,10 +123,10 @@ export interface FilteringOptions {
   courseEngagement: number | null;
   projectDegree: number | null;
   teamProjectDegree: number | null;
-  expectedContractType: ExpectedContractType | null;
+  expectedContractType: ExpectedContractType | null | undefined;
   expectedSalaryFrom: number | null;
   expectedSalaryTo: number | null;
-  expectedTypeWork: ExpectedTypeWork;
+  expectedTypeWork: ExpectedTypeWork | undefined | null | undefined;
   canTakeApprenticeship: boolean | null;
   monthsOfCommercialExp: number | null;
 }
