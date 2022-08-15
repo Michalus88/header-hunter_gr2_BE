@@ -51,15 +51,12 @@ export interface StudentProfileRegister {
   courses: string | undefined;
 }
 
-export interface StudentProfileUpdate extends StudentProfileRegister {
-  email: string;
-}
-
 export interface AvailableStudentRes
   extends Omit<ImportedStudentData, 'email' | 'bonusProjectUrls'> {
   id: string;
   studentInfo: Pick<
     StudentProfileRegister,
+    | 'githubUsername'
     | 'firstName'
     | 'lastName'
     | 'expectedTypeWork'
@@ -77,7 +74,7 @@ export interface ReservedStudentRes extends AvailableStudentRes {
 }
 
 export interface ReservedStudentsWithPaginationRes extends ReservedStudentRes {
-  bookingDateTo: Date;
+  students: ReservedStudentRes[];
   pages: {
     maxPerPage: number;
     currentPage: number;
