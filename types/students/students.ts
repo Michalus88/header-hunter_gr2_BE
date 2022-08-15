@@ -40,9 +40,9 @@ export interface StudentProfileRegister {
   portfolioUrls: string[] | [];
   projectUrls: string[];
   bio: string | undefined;
-  expectedTypeWork: ExpectedTypeWork;
+  expectedTypeWork: ExpectedTypeWork | undefined | null;
   targetWorkCity: string | undefined;
-  expectedContractType: ExpectedContractType;
+  expectedContractType: ExpectedContractType | undefined | null;
   expectedSalary: string | undefined;
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
@@ -51,15 +51,12 @@ export interface StudentProfileRegister {
   courses: string | undefined;
 }
 
-export interface StudentProfileUpdate extends StudentProfileRegister {
-  email: string;
-}
-
 export interface AvailableStudentRes
   extends Omit<ImportedStudentData, 'email' | 'bonusProjectUrls'> {
   id: string;
   studentInfo: Pick<
     StudentProfileRegister,
+    | 'githubUsername'
     | 'firstName'
     | 'lastName'
     | 'expectedTypeWork'
@@ -77,7 +74,7 @@ export interface ReservedStudentRes extends AvailableStudentRes {
 }
 
 export interface ReservedStudentsWithPaginationRes extends ReservedStudentRes {
-  bookingDateTo: Date;
+  students: ReservedStudentRes[];
   pages: {
     maxPerPage: number;
     currentPage: number;
@@ -123,10 +120,10 @@ export interface FilteringOptions {
   courseEngagement: number | null;
   projectDegree: number | null;
   teamProjectDegree: number | null;
-  expectedContractType: ExpectedContractType | null;
+  expectedContractType: ExpectedContractType | null | undefined;
   expectedSalaryFrom: number | null;
   expectedSalaryTo: number | null;
-  expectedTypeWork: ExpectedTypeWork;
+  expectedTypeWork: ExpectedTypeWork | undefined | null | undefined;
   canTakeApprenticeship: boolean | null;
   monthsOfCommercialExp: number | null;
 }
