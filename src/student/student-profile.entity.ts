@@ -3,16 +3,12 @@ import {
   Column,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { StudentStatus } from 'types';
 import { BonusProjectUrl } from './student-bonus-project-url.entity';
-import { HrProfile } from '../hr/hr-profile.entity';
 import { User } from '../user/user.entity';
 import { StudentInfo } from './student-info.entity';
 import { Reservation } from '../reservation/reservation.entity';
