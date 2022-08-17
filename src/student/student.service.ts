@@ -237,6 +237,7 @@ export class StudentService {
         'sInfo.canTakeApprenticeship',
         'sInfo.workExperience',
         'sInfo.monthsOfCommercialExp',
+        'sInfo.githubUsername',
       ])
       .from(StudentProfile, 'student')
       .leftJoin('student.user', 'user')
