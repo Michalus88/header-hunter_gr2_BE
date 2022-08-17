@@ -123,7 +123,7 @@ export interface FilteringOptions {
   expectedContractType: ExpectedContractType | null | undefined;
   expectedSalaryFrom: number | null;
   expectedSalaryTo: number | null;
-  expectedTypeWork: ExpectedTypeWork | undefined | null | undefined;
+  expectedTypeWork: ExpectedTypeWork | undefined | null;
   canTakeApprenticeship: boolean | null;
   monthsOfCommercialExp: number | null;
 }
