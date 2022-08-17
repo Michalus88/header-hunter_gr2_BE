@@ -8,6 +8,8 @@
   "scripts": {
     "prebuild": "rimraf dist && npx mkdirp dist/storage && npx mkdirp dist/storage/students-list",
     "build": "nest build",
+    "build:atthost": "npm run build",
+    "postbuild:atthost": "copyfiles package.json dist/src && copyfiles .env dist/src && npx mkdirp dist/src/tmp && touch dist/src/tmp/restart.txt && echo \"RewriteCond %{ENV:REDIRECT_STATUS} ^$\r\nRewriteCond %{REQUEST_FILENAME} !-f\r\nRewriteCond %{REQUEST_FILENAME} !-d\" > dist/src/.htaccess && mv dist/src/main.js dist/src/app.js && copyfiles * dist && copyfiles * dist/src",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"types/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
