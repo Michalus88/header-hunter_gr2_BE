@@ -65,7 +65,7 @@ export class HrController {
     );
   }
 
-  @Patch('/booking-student/:studentId')
+  @Post('/booking-student/:studentId')
   @UseGuards(JwtAuthGuard, IsHr)
   bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
     return this.hrService.bookingStudent(user, studentId);

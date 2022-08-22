@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsPositive } from 'class-validator';
 import {
+  CanTakeApprenticeship,
   ExpectedContractType,
   ExpectedTypeWork,
   FilteringOptions,
@@ -8,7 +9,7 @@ import {
 export class FilteringOptionsDto implements FilteringOptions {
   @IsNotEmpty()
   @IsPositive()
-  canTakeApprenticeship: boolean | null;
+  canTakeApprenticeship: CanTakeApprenticeship;
 
   @IsNotEmpty()
   @IsPositive()

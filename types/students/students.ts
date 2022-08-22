@@ -115,6 +115,8 @@ export interface DetailedStudentDataRes
   bonusProjectUrls: UrlEntity[];
 }
 
+export type CanTakeApprenticeship = 'true' | 'false' | null;
+
 export interface FilteringOptions {
   courseCompletion: number | null;
   courseEngagement: number | null;
@@ -124,6 +126,6 @@ export interface FilteringOptions {
   expectedSalaryFrom: number | null;
   expectedSalaryTo: number | null;
   expectedTypeWork: ExpectedTypeWork | undefined | null;
-  canTakeApprenticeship: boolean | null;
+  canTakeApprenticeship: CanTakeApprenticeship;
   monthsOfCommercialExp: number | null;
 }
