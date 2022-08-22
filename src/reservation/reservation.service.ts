@@ -7,7 +7,6 @@ import { StudentProfile } from '../student/student-profile.entity';
 import { isReservationValid } from '../utils/is-reservation-valid';
 import { FilteringOptionsDto } from '../student/dto/filtering-options.dto';
 import { ReservedStudentRes, StudentStatus } from '../../types';
-import { User } from '../user/user.entity';
 
 @Injectable()
 export class ReservationService {
