@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '../user/user.entity';
 import { HrProfile } from './hr-profile.entity';
-import { LoggedUserRes, ReservedStudentRes } from '../../types';
+import { LoggedUserRes } from '../../types';
 import { DataSource } from 'typeorm';
 import { StudentService } from '../student/student.service';
 import { ReservationService } from '../reservation/reservation.service';
@@ -104,12 +104,12 @@ export class HrService {
         .where('hr.user = :userId', { userId: user.id })
         .getOne();
       if (!hr) {
-        throw new BadRequestException('User with hr role does not exist.');
+        console.error('User with hr role does not exist.');
       }
 
       return hr;
     } catch (error) {
-      throw new BadRequestException('Wrong field name.');
+      console.error('Wrong field name.');
     }
   }
 }
