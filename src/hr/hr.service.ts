@@ -35,8 +35,13 @@ export class HrService {
 
     return {
       codeStatus: 200,
-      message: `Student with id ${studentId} booked.`,
+      message: `The student has been added to your list`,
     };
+  }
+
+  async removeStudentReservation(user: User, studentId: string) {
+    const { id } = await this.extractedHrFieldsFromUser(user, ['hr.id']);
+    return this.reservationService.remove(id, studentId);
   }
 
   async getBookedStudents(user: User, maxPerPage: number, currentPage: number) {

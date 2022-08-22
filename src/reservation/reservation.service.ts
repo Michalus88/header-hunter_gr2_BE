@@ -7,6 +7,7 @@ import { StudentProfile } from '../student/student-profile.entity';
 import { isReservationValid } from '../utils/is-reservation-valid';
 import { FilteringOptionsDto } from '../student/dto/filtering-options.dto';
 import { ReservedStudentRes, StudentStatus } from '../../types';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class ReservationService {
@@ -33,6 +34,26 @@ export class ReservationService {
     reservation.hrProfile = hrProfile;
     reservation.studentProfile = studentProfile;
     await reservation.save();
+  }
+
+  async remove(hrId: string, studentId: string) {
+    const reservation = await this.dataSource
+      .createQueryBuilder()
+      .select('reservation')
+      .from(Reservation, 'reservation')
+      .where(
+        `reservation.hrProfile = :hrId AND reservation.studentProfile = :studentId`,
+        { hrId, studentId },
+      )
+      .getOne();
+    if (!reservation) {
+      throw new BadRequestException('Reservation does not exist');
+    }
+    await reservation.remove();
+    return {
+      codeStatus: 200,
+      message: `The student has been removed from the list`,
+    };
   }
 
   async verificationStudentBookingTime() {

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -69,6 +70,15 @@ export class HrController {
   @UseGuards(JwtAuthGuard, IsHr)
   bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
     return this.hrService.bookingStudent(user, studentId);
+  }
+
+  @Delete('/booking-student/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
+  removeStudentReservation(
+    @UserObj() user: User,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.hrService.removeStudentReservation(user, studentId);
   }
 
   @Patch('/hired/:studentId')
