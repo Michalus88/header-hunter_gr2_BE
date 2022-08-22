@@ -35,6 +35,26 @@ export class ReservationService {
     await reservation.save();
   }
 
+  async remove(hrId: string, studentId: string) {
+    const reservation = await this.dataSource
+      .createQueryBuilder()
+      .select('reservation')
+      .from(Reservation, 'reservation')
+      .where(
+        `reservation.hrProfile = :hrId AND reservation.studentProfile = :studentId`,
+        { hrId, studentId },
+      )
+      .getOne();
+    if (!reservation) {
+      throw new BadRequestException('Reservation does not exist');
+    }
+    await reservation.remove();
+    return {
+      codeStatus: 200,
+      message: `The student has been removed from the list`,
+    };
+  }
+
   async verificationStudentBookingTime() {
     const reservations = await Reservation.find();
     if (reservations.length === 0) return;

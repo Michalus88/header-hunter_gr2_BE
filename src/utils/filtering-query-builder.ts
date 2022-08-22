@@ -20,7 +20,11 @@ export const filteringQueryBuilder = (
         key === 'monthsOfCommercialExp' ||
         key === 'expectedTypeWork'
       ) {
-        query += ` AND sInfo.${key} = :${key}`;
+        if (key === 'monthsOfCommercialExp') {
+          query += ` AND sInfo.${key} >= :${key}`;
+        } else {
+          query += ` AND sInfo.${key} = :${key}`;
+        }
       } else {
         query += ` AND student.${key} = :${key}`;
       }
@@ -34,7 +38,7 @@ export const filteringQueryBuilder = (
     }
     salary = ` AND sInfo.expectedSalary BETWEEN ${salaryFrom} AND ${salaryTo}`;
   } else if (salaryFrom) {
-    salary = ` AND sInfo.expectedSalary > ${salaryFrom}`;
+    salary = ` AND sInfo.expectedSalary >= ${salaryFrom}`;
   } else if (salaryTo) {
     salary = ` AND sInfo.expectedSalary <= ${salaryTo}`;
   }
