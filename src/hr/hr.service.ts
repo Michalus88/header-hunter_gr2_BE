@@ -30,13 +30,7 @@ export class HrService {
       studentId,
     );
     const hr = await this.extractedHrFieldsFromUser(user);
-    await this.reservationService.isStudentBooked(hr, studentId);
-    await this.reservationService.add(hr, studentProfile);
-
-    return {
-      codeStatus: 200,
-      message: `The student has been added to your list`,
-    };
+    return this.reservationService.add(hr, studentProfile);
   }
 
   async removeStudentReservation(user: User, studentId: string) {
@@ -44,15 +38,7 @@ export class HrService {
     return this.reservationService.remove(id, studentId);
   }
 
-  async getBookedStudents(user: User, maxPerPage: number, currentPage: number) {
-    await this.reservationService.verificationStudentBookingTime();
-    const hr = await this.extractedHrFieldsFromUser(user, ['hr.id']);
-    const { id } = hr;
-    const bookedStudents = await this.reservationService.getBookedStudents(id);
-    return pagination(bookedStudents, maxPerPage, currentPage);
-  }
-
-  async getFilteredBookingStudents(
+  async getBookedStudents(
     user: User,
     filteringOptions: FilteringOptionsDto,
     maxPerPage: number,
