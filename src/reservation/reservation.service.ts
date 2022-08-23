@@ -28,11 +28,16 @@ export class ReservationService {
   }
 
   async add(hrProfile: HrProfile, studentProfile: StudentProfile) {
+    await this.isStudentBooked(hrProfile, studentProfile.id);
     const reservation = new Reservation();
     reservation.bookingDateTo = setMaxReservationTime(10);
     reservation.hrProfile = hrProfile;
     reservation.studentProfile = studentProfile;
     await reservation.save();
+    return {
+      codeStatus: 200,
+      message: `The student has been added to your list`,
+    };
   }
 
   async remove(hrId: string, studentId: string) {
