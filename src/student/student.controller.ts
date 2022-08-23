@@ -26,7 +26,7 @@ import { Response } from 'express';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  @Get('/detailed')
+  @Get('/')
   @UseGuards(JwtAuthGuard, IsStudent)
   getDetailedStudent(@UserObj() user: User) {
     return this.studentService.getDetailedStudent(user);
@@ -69,7 +69,7 @@ export class StudentController {
     );
   }
 
-  @Patch('/hired')
+  @Patch('/')
   @UseGuards(JwtAuthGuard, IsStudent)
   markAsHired(@UserObj() user: User, @Res() res: Response) {
     return this.studentService.markAsHired(user, res);

@@ -39,6 +39,11 @@ export class HrController {
   ) {
     return this.studentService.getDetailedStudent(user, studentId);
   }
+  @Post('/booked-students/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
+  bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
+    return this.hrService.bookingStudent(user, studentId);
+  }
 
   @Post('/booked-students/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
@@ -56,22 +61,7 @@ export class HrController {
     );
   }
 
-  @Post('/booking-student/:studentId')
-  @UseGuards(JwtAuthGuard, IsHr)
-  bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
-    return this.hrService.bookingStudent(user, studentId);
-  }
-
-  @Delete('/booking-student/:studentId')
-  @UseGuards(JwtAuthGuard, IsHr)
-  removeStudentReservation(
-    @UserObj() user: User,
-    @Param('studentId') studentId: string,
-  ) {
-    return this.hrService.removeStudentReservation(user, studentId);
-  }
-
-  @Patch('/hired/:studentId')
+  @Patch('/booked-students/:studentId')
   @UseGuards(JwtAuthGuard, IsHr)
   markAsHired(
     @UserObj() user: User,
@@ -79,5 +69,14 @@ export class HrController {
     @Param('studentId') studentId: string,
   ) {
     return this.studentService.markAsHired(user, res, studentId);
+  }
+
+  @Delete('/booked-students/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
+  removeStudentReservation(
+    @UserObj() user: User,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.hrService.removeStudentReservation(user, studentId);
   }
 }
