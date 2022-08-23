@@ -39,18 +39,13 @@ export class HrController {
   ) {
     return this.studentService.getDetailedStudent(user, studentId);
   }
-
-  @Get('/booked-students/:maxPerPage?/:currentPage?')
+  @Post('/booked-students/:studentId')
   @UseGuards(JwtAuthGuard, IsHr)
-  getBookedStudents(
-    @UserObj() user: User,
-    @Param('maxPerPage') maxPerPage: number,
-    @Param('currentPage') currentPage: number,
-  ) {
-    return this.hrService.getBookedStudents(user, maxPerPage, currentPage);
+  bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
+    return this.hrService.bookingStudent(user, studentId);
   }
 
-  @Post('/booked-students/filtered/:maxPerPage?/:currentPage?')
+  @Post('/booked-students/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
   getBookedFilteredStudent(
     @UserObj() user: User,
@@ -58,7 +53,7 @@ export class HrController {
     @Param('maxPerPage') maxPerPage: number,
     @Param('currentPage') currentPage: number,
   ) {
-    return this.hrService.getFilteredBookingStudents(
+    return this.hrService.getBookedStudents(
       user,
       filteringOptions,
       maxPerPage,
@@ -66,22 +61,7 @@ export class HrController {
     );
   }
 
-  @Post('/booking-student/:studentId')
-  @UseGuards(JwtAuthGuard, IsHr)
-  bookingStudent(@UserObj() user: User, @Param('studentId') studentId: string) {
-    return this.hrService.bookingStudent(user, studentId);
-  }
-
-  @Delete('/booking-student/:studentId')
-  @UseGuards(JwtAuthGuard, IsHr)
-  removeStudentReservation(
-    @UserObj() user: User,
-    @Param('studentId') studentId: string,
-  ) {
-    return this.hrService.removeStudentReservation(user, studentId);
-  }
-
-  @Patch('/hired/:studentId')
+  @Patch('/booked-students/:studentId')
   @UseGuards(JwtAuthGuard, IsHr)
   markAsHired(
     @UserObj() user: User,
@@ -89,5 +69,14 @@ export class HrController {
     @Param('studentId') studentId: string,
   ) {
     return this.studentService.markAsHired(user, res, studentId);
+  }
+
+  @Delete('/booked-students/:studentId')
+  @UseGuards(JwtAuthGuard, IsHr)
+  removeStudentReservation(
+    @UserObj() user: User,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.hrService.removeStudentReservation(user, studentId);
   }
 }
