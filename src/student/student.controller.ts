@@ -26,24 +26,15 @@ import { Response } from 'express';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  @Get('/available/:maxPerPage?/:currentPage?')
-  @UseGuards(JwtAuthGuard, IsHr)
-  getAllAvailableWhitPagination(
-    @Param('maxPerPage') maxPerPage: number,
-    @Param('currentPage') currentPage: number,
-  ) {
-    return this.studentService.getAllAvailable(maxPerPage, currentPage);
-  }
-
   @Get('/detailed')
   @UseGuards(JwtAuthGuard, IsStudent)
   getDetailedStudent(@UserObj() user: User) {
     return this.studentService.getDetailedStudent(user);
   }
 
-  @Post('/filtered/:maxPerPage?/:currentPage?')
+  @Post('/:maxPerPage?/:currentPage?')
   @UseGuards(JwtAuthGuard, IsHr)
-  getFilteredStudent(
+  getAvailableStudents(
     @Body() filteringOptions: FilteringOptions,
     @Param('maxPerPage') maxPerPage: number,
     @Param('currentPage') currentPage: number,
