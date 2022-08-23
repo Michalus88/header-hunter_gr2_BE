@@ -53,7 +53,7 @@ export class HrController {
     @Param('maxPerPage') maxPerPage: number,
     @Param('currentPage') currentPage: number,
   ) {
-    return this.hrService.getFilteredBookingStudents(
+    return this.hrService.getBookedStudents(
       user,
       filteringOptions,
       maxPerPage,
