@@ -169,7 +169,14 @@ export class StudentService {
     } else {
       const student = await this.dataSource
         .createQueryBuilder()
-        .select(['student', 'sInfo.firstName', 'sInfo.lastName', 'user.email'])
+        .select([
+          'student',
+          'sInfo.firstName',
+          'sInfo.lastName',
+          'sInfo.tel',
+          'sInfo.githubUsername',
+          'user.email',
+        ])
         .from(StudentProfile, 'student')
         .leftJoin('student.studentInfo', 'sInfo')
         .leftJoin('student.user', 'user')
