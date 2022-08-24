@@ -1,5 +1,4 @@
 import { IsNotEmpty } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 import {
   ExpectedContractType,
   ExpectedTypeWork,
@@ -8,7 +7,6 @@ import {
 
 export class StudentProfileActivationDto implements StudentProfileRegister {
   tel: string;
-  @ApiProperty()
   @IsNotEmpty()
   firstName: string;
 
