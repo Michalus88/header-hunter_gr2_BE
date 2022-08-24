@@ -166,50 +166,62 @@ export class StudentService {
         statusCode: 200,
         message: 'You mark as hired and lost access to the application.',
       });
-    } else {
-      const student = await this.dataSource
-        .createQueryBuilder()
-        .select([
-          'student',
-          'sInfo.firstName',
-          'sInfo.lastName',
-          'sInfo.tel',
-          'sInfo.githubUsername',
-          'user.email',
-        ])
-        .from(StudentProfile, 'student')
-        .leftJoin('student.studentInfo', 'sInfo')
-        .leftJoin('student.user', 'user')
-        .where(
-          'student.id = :studentId And user.isActive = true And NOT student.status = :hired',
-          {
-            studentId,
-            hired: StudentStatus.HIRED,
-          },
-        )
-        .getOne();
-      if (!student) {
-        throw new BadRequestException('Student do not exist.');
-      }
-      student.status = StudentStatus.HIRED;
-      await student.save();
-      const { studentInfo, user: userStudent } = student;
-      const hr = await this.dataSource
-        .createQueryBuilder()
-        .select(['hr.firstName', 'hr.lastName', 'hr.company'])
-        .from(HrProfile, 'hr')
-        .where('hr.userId = :userId', { userId: user.id })
-        .getOne();
-      await this.mailService.employmentNotification(
-        userStudent.email,
-        studentInfo.firstName,
-        studentInfo.lastName,
-        user.email,
-        hr.firstName,
-        hr.lastName,
-        hr.company,
-      );
     }
+    const student = await this.dataSource
+      .createQueryBuilder()
+      .select([
+        'student',
+        'sInfo.firstName',
+        'sInfo.lastName',
+        'sInfo.tel',
+        'sInfo.githubUsername',
+        'user.email',
+      ])
+      .from(StudentProfile, 'student')
+      .leftJoin('student.studentInfo', 'sInfo')
+      .leftJoin('student.user', 'user')
+      .where(
+        'student.id = :studentId And user.isActive = true And NOT student.status = :hired',
+        {
+          studentId,
+          hired: StudentStatus.HIRED,
+        },
+      )
+      .getOne();
+    if (!student) {
+      throw new BadRequestException('Student do not exist.');
+    }
+    student.status = StudentStatus.HIRED;
+    await student.save();
+    const { studentInfo, user: userStudent } = student;
+    const hr = await this.dataSource
+      .createQueryBuilder()
+      .select(['hr.firstName', 'hr.lastName', 'hr.company'])
+      .from(HrProfile, 'hr')
+      .where('hr.userId = :userId', { userId: user.id })
+      .getOne();
+    await this.mailService.employmentNotification(
+      userStudent.email,
+      studentInfo.firstName,
+      studentInfo.lastName,
+      user.email,
+      hr.firstName,
+      hr.lastName,
+      hr.company,
+    );
+    await this.mailService.employedStudentInfo(
+      'michalus88@gmail.com',
+      userStudent.email,
+      studentInfo.tel,
+      studentInfo.firstName,
+      studentInfo.lastName,
+      studentInfo.githubUsername,
+    );
+
+    res.json({
+      statusCode: 200,
+      message: "E-mail with the student's details has been sent",
+    });
   }
 
   async getAllAvailable(
