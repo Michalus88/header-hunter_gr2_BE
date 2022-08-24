@@ -29,7 +29,6 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
-    "@nestjs/swagger": "^6.0.5",
     "@nestjs/typeorm": "^9.0.0",
     "@sendgrid/mail": "^7.6.2",
     "@types/cookie-parser": "^1.4.3",
