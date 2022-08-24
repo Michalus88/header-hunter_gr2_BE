@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, Max, MaxLength, Min } from 'class-validator';
 
 import {
@@ -8,7 +7,6 @@ import {
 } from 'types';
 
 export class StudentProfileUpdateDto implements StudentProfileRegister {
-  @ApiProperty()
   @MaxLength(9)
   tel: string;
 
