@@ -73,9 +73,29 @@ export class MailService {
       },
     };
     await this.mailerService.sendMail(mail);
-    return {
-      statusCode: 200,
-      message: `Student hired successful.`,
+  }
+
+  async employedStudentInfo(
+    emailTo: string,
+    email: string,
+    tel: string,
+    firstName: string,
+    lastName: string,
+    githubUsername: string,
+  ) {
+    const mail = {
+      to: emailTo,
+      subject: 'Employed student info',
+      from: 'headerhuntergr2@gmail.com',
+      template: 'employed-student-info',
+      context: {
+        email,
+        tel,
+        firstName,
+        lastName,
+        githubUsername,
+      },
     };
+    await this.mailerService.sendMail(mail);
   }
 }
