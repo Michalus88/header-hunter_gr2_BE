@@ -210,7 +210,7 @@ export class StudentService {
       hr.company,
     );
     await this.mailService.employedStudentInfo(
-      'michalus88@gmail.com',
+      user.email,
       userStudent.email,
       studentInfo.tel,
       studentInfo.firstName,
@@ -270,14 +270,6 @@ export class StudentService {
       .getMany()) as unknown as AvailableStudentRes[];
     return pagination(allAvailable, Number(maxPerPage), Number(currentPage));
   }
-
-  // async getAllAvailableWhitPagination(
-  //   maxPerPage?: number,
-  //   currentPage?: number,
-  // ) {
-  //   const allAvailable = await this.getAllAvailable();
-  //   return pagination(allAvailable, Number(maxPerPage), Number(currentPage));
-  // }
 
   async getFilteredStudents(
     filteringOptions: FilteringOptionsDto,
