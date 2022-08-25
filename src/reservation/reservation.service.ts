@@ -29,6 +29,13 @@ export class ReservationService {
 
   async add(hrProfile: HrProfile, studentProfile: StudentProfile) {
     await this.isStudentBooked(hrProfile, studentProfile.id);
+    if (hrProfile.maxReservedStudents === 0) {
+      throw new BadRequestException(
+        'The student interview limit has been exceeded',
+      );
+    }
+    hrProfile.maxReservedStudents -= 1;
+    await hrProfile.save();
     const reservation = new Reservation();
     reservation.bookingDateTo = setMaxReservationTime(10);
     reservation.hrProfile = hrProfile;
