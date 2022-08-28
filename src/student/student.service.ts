@@ -31,6 +31,7 @@ import { AuthService } from '../auth/auth.service';
 import { pagination } from 'src/utils/pagination';
 import { MailService } from '../mail/mail.service';
 import { HrProfile } from '../hr/hr-profile.entity';
+import { ReservationService } from '../reservation/reservation.service';
 
 @Injectable()
 export class StudentService {
@@ -38,6 +39,8 @@ export class StudentService {
     private dataSource: DataSource,
     @Inject(forwardRef(() => AuthService)) private authService: AuthService,
     @Inject(forwardRef(() => MailService)) private mailService: MailService,
+    @Inject(forwardRef(() => ReservationService))
+    private reservationService: ReservationService,
   ) {}
 
   async activateProfile(
@@ -202,6 +205,7 @@ export class StudentService {
       .getOne();
     hr.maxReservedStudents += 1;
     await hr.save();
+    await this.reservationService.remove(hr, studentId);
     await this.mailService.employmentNotification(
       userStudent.email,
       studentInfo.firstName,
