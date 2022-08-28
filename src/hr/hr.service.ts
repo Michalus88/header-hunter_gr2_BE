@@ -34,8 +34,8 @@ export class HrService {
   }
 
   async removeStudentReservation(user: User, studentId: string) {
-    const { id } = await this.extractedHrFieldsFromUser(user, ['hr.id']);
-    return this.reservationService.remove(id, studentId);
+    const hr = await this.extractedHrFieldsFromUser(user);
+    return this.reservationService.remove(hr, studentId);
   }
 
   async getBookedStudents(
