@@ -47,19 +47,21 @@ export class ReservationService {
     };
   }
 
-  async remove(hrId: string, studentId: string) {
+  async remove(hrProfile: HrProfile, studentId: string) {
     const reservation = await this.dataSource
       .createQueryBuilder()
       .select('reservation')
       .from(Reservation, 'reservation')
       .where(
         `reservation.hrProfile = :hrId AND reservation.studentProfile = :studentId`,
-        { hrId, studentId },
+        { hrId: hrProfile.id, studentId },
       )
       .getOne();
     if (!reservation) {
       throw new BadRequestException('Reservation does not exist');
     }
+    hrProfile.maxReservedStudents += 1;
+    await hrProfile.save();
     await reservation.remove();
     return {
       codeStatus: 200,

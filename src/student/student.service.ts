@@ -196,10 +196,12 @@ export class StudentService {
     const { studentInfo, user: userStudent } = student;
     const hr = await this.dataSource
       .createQueryBuilder()
-      .select(['hr.firstName', 'hr.lastName', 'hr.company'])
+      .select('hr')
       .from(HrProfile, 'hr')
       .where('hr.userId = :userId', { userId: user.id })
       .getOne();
+    hr.maxReservedStudents += 1;
+    await hr.save();
     await this.mailService.employmentNotification(
       userStudent.email,
       studentInfo.firstName,
