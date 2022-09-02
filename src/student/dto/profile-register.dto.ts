@@ -16,30 +16,28 @@ export class StudentProfileActivationDto implements StudentProfileRegister {
   @IsNotEmpty()
   githubUsername: string;
 
-  portfolioUrls: string[] | undefined;
+  portfolioUrls: string[] | [];
 
   @IsNotEmpty()
   projectUrls: string[];
 
-  bio: string;
+  bio: string | null;
 
-  @IsNotEmpty()
   expectedTypeWork: ExpectedTypeWork;
 
-  targetWorkCity: string;
+  targetWorkCity: string | null;
 
-  @IsNotEmpty()
-  expectedContractType: ExpectedContractType;
+  expectedContractType: ExpectedContractType | null;
 
-  expectedSalary: string;
+  expectedSalary: string | null;
 
-  canTakeApprenticeship: boolean;
+  canTakeApprenticeship: boolean | null;
 
   monthsOfCommercialExp: number;
 
-  education: string;
+  education: string | null;
 
-  workExperience: string;
+  workExperience: string | null;
 
-  courses: string;
+  courses: string | null;
 }
