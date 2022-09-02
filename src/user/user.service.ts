@@ -110,14 +110,12 @@ export class UserService {
           Role.STUDENT,
         );
         await this.studentService.saveDataFromCsvToDb(student, user);
-
-        // Wyłączone wysyłanie emaili przy developmencie
-        // await this.mailService.sendActivateLink(
-        //   student.email,
-        //   userId,
-        //   registerToken,
-        //   password,
-        // );
+        await this.mailService.sendActivateLink(
+          student.email,
+          user.id,
+          registerToken,
+          password,
+        );
       }
     }
 
