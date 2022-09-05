@@ -25,6 +25,7 @@ export enum ExpectedContractType {
   EMPLOYMENT_CONTRACT,
   B_TO_B,
   COMMISSION_CONTRACT_OR_SPECIFIC_TASK_CONTRACT,
+  IRRELEVANT,
 }
 
 export interface UrlEntity {
