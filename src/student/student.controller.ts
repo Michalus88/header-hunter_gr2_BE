@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { StudentProfileActivationDto } from './dto/profile-register.dto';
+import { StudentProfileDto } from './dto/profile-form.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { FilteringOptions } from '../../types';
 import { IsHr } from '../guards/is-hr';
@@ -48,7 +48,7 @@ export class StudentController {
 
   @Post('/activate/:userId/:registerToken')
   activateProfile(
-    @Body() studentProfileActivation: StudentProfileActivationDto,
+    @Body() studentProfileActivation: StudentProfileDto,
     @Param('userId') userId: string,
     @Param('registerToken') registerToken: string,
   ) {
@@ -62,7 +62,10 @@ export class StudentController {
   @Put('/')
   @UseGuards(JwtAuthGuard, IsStudent)
   @UseInterceptors(GithubUserValidate, EmailExistInDBValidate)
-  studentProfileUpdate(@UserObj() user: User, @Body() studentProfileUpdateDto) {
+  studentProfileUpdate(
+    @UserObj() user: User,
+    @Body() studentProfileUpdateDto: StudentProfileDto,
+  ) {
     return this.studentService.studentProfileUpdate(
       user,
       studentProfileUpdateDto,
