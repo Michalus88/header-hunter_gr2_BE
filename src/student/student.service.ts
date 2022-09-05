@@ -97,9 +97,9 @@ export class StudentService {
       studentProfile.studentInfo = studentInfo;
       await studentProfile.save();
 
-      const portfolioUrlsEntity = new StudentPortfolioUrl();
       if (portfolioUrls) {
         for (const url of portfolioUrls) {
+          const portfolioUrlsEntity = new StudentPortfolioUrl();
           portfolioUrlsEntity.url = url;
           portfolioUrlsEntity.studentInfo = studentInfo;
           await portfolioUrlsEntity.save();
