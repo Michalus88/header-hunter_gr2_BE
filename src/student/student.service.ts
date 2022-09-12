@@ -439,39 +439,29 @@ export class StudentService {
 
       studentInfo.firstName = firstName ?? studentInfo.firstName;
       studentInfo.lastName = lastName ?? studentInfo.lastName;
-      studentInfo.tel = tel ?? studentInfo.tel;
+      studentInfo.tel = tel;
       studentInfo.githubUsername = githubUsername ?? studentInfo.githubUsername;
-      studentInfo.bio = bio ?? studentInfo.bio;
-      studentInfo.expectedSalary = expectedSalary ?? studentInfo.expectedSalary;
-      studentInfo.expectedTypeWork =
-        expectedTypeWork ?? studentInfo.expectedTypeWork;
-      studentInfo.targetWorkCity = targetWorkCity ?? studentInfo.targetWorkCity;
-      studentInfo.expectedContractType =
-        expectedContractType ?? studentInfo.expectedContractType;
-      studentInfo.courses = courses ?? studentInfo.courses;
-      studentInfo.canTakeApprenticeship =
-        canTakeApprenticeship ?? studentInfo.canTakeApprenticeship;
-      studentInfo.workExperience = workExperience ?? studentInfo.workExperience;
-      studentInfo.monthsOfCommercialExp =
-        monthsOfCommercialExp ?? studentInfo.monthsOfCommercialExp;
-      studentInfo.education = education ?? studentInfo.education;
+      studentInfo.bio = bio;
+      studentInfo.expectedSalary = expectedSalary;
+      studentInfo.expectedTypeWork = expectedTypeWork;
+      studentInfo.targetWorkCity = targetWorkCity;
+      studentInfo.expectedContractType = expectedContractType;
+      studentInfo.courses = courses;
+      studentInfo.canTakeApprenticeship = canTakeApprenticeship;
+      studentInfo.workExperience = workExperience;
+      studentInfo.monthsOfCommercialExp = monthsOfCommercialExp;
+      studentInfo.education = education;
       await studentInfo.save();
 
-      if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
-        await this.removeUrls(studentInfo.portfolioUrls);
-        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-      } else if (portfolioUrls?.length) {
-        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-      }
-      if (projectUrls.length > 0) {
-        await this.removeUrls(studentInfo.projectUrls);
-        await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
+      await this.removeUrls(studentInfo.portfolioUrls);
+      await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
+      await this.removeUrls(studentInfo.projectUrls);
+      await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
 
-        return {
-          statusCode: 200,
-          message: 'Success.',
-        };
-      }
+      return {
+        statusCode: 200,
+        message: 'Success.',
+      };
     } catch (err) {
       if (err.errno && err.errno === 1062) {
         throw new BadRequestException(
