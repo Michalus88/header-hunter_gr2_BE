@@ -101,7 +101,7 @@ export interface AvailableStudentsWithtPaginationRes {
 //   user: { email: string };
 // }
 
-interface StudentInfo
+export interface StudentInfo
   extends Omit<StudentProfileRegister, 'portfolioUrls' | 'projectUrls'> {
   portfolioUrls: UrlEntity[] | [];
   projectUrls: UrlEntity[];
