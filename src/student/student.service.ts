@@ -407,8 +407,7 @@ export class StudentService {
       .select(['student.id', 'sInfo.id'])
       .from(StudentProfile, 'student')
       .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.user', 'user')
-      .where('student.userId = user.id')
+      .where('student.userId = :userId', { userId: user.id })
       .getOne();
     if (!student) {
       throw new BadRequestException('The student do not exist.');
