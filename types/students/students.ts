@@ -25,6 +25,7 @@ export enum ExpectedContractType {
   EMPLOYMENT_CONTRACT,
   B_TO_B,
   COMMISSION_CONTRACT_OR_SPECIFIC_TASK_CONTRACT,
+  IRRELEVANT,
 }
 
 export interface UrlEntity {
@@ -100,7 +101,7 @@ export interface AvailableStudentsWithtPaginationRes {
 //   user: { email: string };
 // }
 
-interface StudentInfo
+export interface StudentInfo
   extends Omit<StudentProfileRegister, 'portfolioUrls' | 'projectUrls'> {
   portfolioUrls: UrlEntity[] | [];
   projectUrls: UrlEntity[];

@@ -9,7 +9,6 @@ import { sign } from 'jsonwebtoken';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { hashPwd } from 'src/utils/hash-pwd';
-import { sanitizeUser } from '../utils/sanitize-user';
 import { stringToBoolean } from '../utils/string-to-boolean';
 import { DataSource } from 'typeorm';
 import { StudentProfile } from '../student/student-profile.entity';
@@ -54,9 +53,9 @@ export class AuthService {
     const userRes = await this.userService.getMe(user);
     return res
       .cookie('jwt', token, {
-        secure: false,
+        secure: stringToBoolean(process.env.COOKIE_SECURE),
         domain: process.env.DOMAIN,
-        httpOnly: stringToBoolean(process.env.COOKIE_SECURE),
+        httpOnly: true,
         maxAge: oneDay,
       })
       .json(userRes);
@@ -66,9 +65,9 @@ export class AuthService {
     const resObj = responseObj ?? { message: 'Logout was successful' };
     return res
       .clearCookie('jwt', {
-        secure: false,
+        secure: stringToBoolean(process.env.COOKIE_SECURE),
         domain: process.env.DOMAIN,
-        httpOnly: stringToBoolean(process.env.COOKIE_SECURE),
+        httpOnly: true,
       })
       .json(resObj);
   }

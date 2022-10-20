@@ -15,7 +15,7 @@ import {
   Role,
   StudentStatus,
 } from 'types';
-import { StudentProfileActivationDto } from './dto/profile-register.dto';
+import { StudentProfileDto } from './dto/profile-form.dto';
 import { StudentProfile } from './student-profile.entity';
 import { StudentPortfolioUrl } from './student-portfolio-url.entity';
 import { StudentProjectUrl } from './student-project-url.entity';
@@ -24,7 +24,6 @@ import { validateActivationCredentials } from '../utils/validate-activation-cred
 import { DataSource } from 'typeorm';
 import { StudentInfo } from './student-info.entity';
 import { uuid } from 'uuidv4';
-import { StudentProfileUpdateDto } from './dto/profile-update.dto';
 import { FilteringOptionsDto } from './dto/filtering-options.dto';
 import { filteringQueryBuilder } from '../utils/filtering-query-builder';
 import { AuthService } from '../auth/auth.service';
@@ -44,7 +43,7 @@ export class StudentService {
   ) {}
 
   async activateProfile(
-    studentProfileActivation: StudentProfileActivationDto,
+    studentProfileActivation: StudentProfileDto,
     userId: string,
     registerToken: string,
   ) {
@@ -98,9 +97,9 @@ export class StudentService {
       studentProfile.studentInfo = studentInfo;
       await studentProfile.save();
 
-      const portfolioUrlsEntity = new StudentPortfolioUrl();
       if (portfolioUrls) {
         for (const url of portfolioUrls) {
+          const portfolioUrlsEntity = new StudentPortfolioUrl();
           portfolioUrlsEntity.url = url;
           portfolioUrlsEntity.studentInfo = studentInfo;
           await portfolioUrlsEntity.save();
@@ -401,15 +400,14 @@ export class StudentService {
 
   async studentProfileUpdate(
     user: User,
-    studentProfileUpdateDto: StudentProfileUpdateDto,
+    studentProfileUpdateDto: StudentProfileDto,
   ) {
     const student = await this.dataSource
       .createQueryBuilder()
       .select(['student.id', 'sInfo.id'])
       .from(StudentProfile, 'student')
       .leftJoin('student.studentInfo', 'sInfo')
-      .leftJoin('student.user', 'user')
-      .where('student.userId = user.id')
+      .where('student.userId = :userId', { userId: user.id })
       .getOne();
     if (!student) {
       throw new BadRequestException('The student do not exist.');
@@ -441,39 +439,29 @@ export class StudentService {
 
       studentInfo.firstName = firstName ?? studentInfo.firstName;
       studentInfo.lastName = lastName ?? studentInfo.lastName;
-      studentInfo.tel = tel ?? studentInfo.tel;
+      studentInfo.tel = tel;
       studentInfo.githubUsername = githubUsername ?? studentInfo.githubUsername;
-      studentInfo.bio = bio ?? studentInfo.bio;
-      studentInfo.expectedSalary = expectedSalary ?? studentInfo.expectedSalary;
-      studentInfo.expectedTypeWork =
-        expectedTypeWork ?? studentInfo.expectedTypeWork;
-      studentInfo.targetWorkCity = targetWorkCity ?? studentInfo.targetWorkCity;
-      studentInfo.expectedContractType =
-        expectedContractType ?? studentInfo.expectedContractType;
-      studentInfo.courses = courses ?? studentInfo.courses;
-      studentInfo.canTakeApprenticeship =
-        canTakeApprenticeship ?? studentInfo.canTakeApprenticeship;
-      studentInfo.workExperience = workExperience ?? studentInfo.workExperience;
-      studentInfo.monthsOfCommercialExp =
-        monthsOfCommercialExp ?? studentInfo.monthsOfCommercialExp;
-      studentInfo.education = education ?? studentInfo.education;
+      studentInfo.bio = bio;
+      studentInfo.expectedSalary = expectedSalary;
+      studentInfo.expectedTypeWork = expectedTypeWork;
+      studentInfo.targetWorkCity = targetWorkCity;
+      studentInfo.expectedContractType = expectedContractType;
+      studentInfo.courses = courses;
+      studentInfo.canTakeApprenticeship = canTakeApprenticeship;
+      studentInfo.workExperience = workExperience;
+      studentInfo.monthsOfCommercialExp = monthsOfCommercialExp;
+      studentInfo.education = education;
       await studentInfo.save();
 
-      if (portfolioUrls?.length && studentInfo.portfolioUrls?.length) {
-        await this.removeUrls(studentInfo.portfolioUrls);
-        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-      } else if (portfolioUrls?.length) {
-        await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
-      }
-      if (projectUrls.length > 0) {
-        await this.removeUrls(studentInfo.projectUrls);
-        await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
+      await this.removeUrls(studentInfo.portfolioUrls);
+      await this.addUrls(StudentPortfolioUrl, portfolioUrls, studentInfo);
+      await this.removeUrls(studentInfo.projectUrls);
+      await this.addUrls(StudentProjectUrl, projectUrls, studentInfo);
 
-        return {
-          statusCode: 200,
-          message: 'Success.',
-        };
-      }
+      return {
+        statusCode: 200,
+        message: 'Success.',
+      };
     } catch (err) {
       if (err.errno && err.errno === 1062) {
         throw new BadRequestException(
